@@ -1,42 +1,48 @@
-import React, {Component} from 'react';
-import logo from './logo.svg';
-import './App.css';
-import axios from 'axios';
+import React, {Component, Fragment} from 'react';
+import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
+import Modules from './Components/Modules'
+import NotFound from './Components/Errors/404'
+import Layout from './Components/Layout'
+import Home from './Components/Home'
 
 class App extends Component {
 
-
     state = {
-        response : null
+        modules: null,
     };
 
     componentDidMount() {
-        axios.get(`/ping`)
-            .then(res => {
-                const response = res.data;
-                this.setState({ response });
-            })
+        this.fetchModules();
     }
 
+    async fetchModules() {
+        console.log(`fetching modules`);
+        const response = await fetch('http://localhost:9090/modules');
+        const modules = await response.json();
+        console.log(`fetched modules ${JSON.stringify(modules)}`);
+        this.setState({modules});
+    }
+
+
+
     render() {
-        const { response } = this.state;
+        const {modules} = this.state;
 
         return (
-            <div className="App">
-                <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo"/>
-                    <h1 className="App-title">Welcome to RaspberryWallet</h1>
-                </header>
+            <BrowserRouter>
 
-                <p className="App-intro">
-                    RaspberryWallet
-                </p>
-                {response && <p>
-                    Response from server: {response}
-                </p>
-                }
+                <Layout modules={modules} >
 
-            </div>
+                    <Switch>
+                        <Route exact path="/" render={props => <Home {...props}/>}/>
+                        <Route path="/modules" render={
+                            props => <Modules {...props} modules={modules}/>
+                        }/>
+                        <Route component={NotFound}/>
+                    </Switch>
+
+                </Layout>
+            </BrowserRouter>
         );
     }
 }

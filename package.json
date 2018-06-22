@@ -2,20 +2,21 @@
   "name": "raspberry-wallet-frontend",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@material-ui/core": "^1.1.0",
-    "@material-ui/icons": "^1.1.0",
-    "axios": "^0.18.0",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-scripts": "1.1.4",
-    "react-toastify": "^4.0.2"
-  },
-  "proxy": "http://localhost:9090",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "@material-ui/core": "^1.2.3",
+    "@material-ui/icons": "^1.1.0",
+    "axios": "^0.18.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "1.1.4",
+    "react-toastify": "^4.0.2",
+    "recompose": "latest"
   }
 }
