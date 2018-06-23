@@ -4,6 +4,17 @@ import Modules from './Components/Modules'
 import NotFound from './Components/Errors/404'
 import Layout from './Components/Layout'
 import Home from './Components/Home'
+import {serverUrl} from './config'
+import {MuiThemeProvider, createMuiTheme} from '@material-ui/core/styles';
+import {blue,yellow, indigo} from '@material-ui/core/colors';
+
+const theme = createMuiTheme({
+    palette: {
+        primary: indigo,
+        secondary: yellow,
+        type: 'dark',
+    }
+});
 
 class App extends Component {
 
@@ -17,12 +28,11 @@ class App extends Component {
 
     async fetchModules() {
         console.log(`fetching modules`);
-        const response = await fetch('http://localhost:9090/modules');
+        const response = await fetch(serverUrl + '/api/modules');
         const modules = await response.json();
         console.log(`fetched modules ${JSON.stringify(modules)}`);
         this.setState({modules});
     }
-
 
 
     render() {
@@ -30,18 +40,19 @@ class App extends Component {
 
         return (
             <BrowserRouter>
+                <MuiThemeProvider theme={theme}>
+                    <Layout modules={modules}>
 
-                <Layout modules={modules} >
+                        <Switch>
+                            <Route exact path="/" render={props => <Home {...props} modules={modules}/>}/>
+                            <Route path="/modules" render={
+                                props => <Modules {...props} modules={modules}/>
+                            }/>
+                            <Route component={NotFound}/>
+                        </Switch>
 
-                    <Switch>
-                        <Route exact path="/" render={props => <Home {...props}/>}/>
-                        <Route path="/modules" render={
-                            props => <Modules {...props} modules={modules}/>
-                        }/>
-                        <Route component={NotFound}/>
-                    </Switch>
-
-                </Layout>
+                    </Layout>
+                </MuiThemeProvider>
             </BrowserRouter>
         );
     }

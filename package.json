@@ -18,5 +18,6 @@
     "react-scripts": "1.1.4",
     "react-toastify": "^4.0.2",
     "recompose": "latest"
-  }
+  },
+  "proxy": "http://localhost:8080"
 }

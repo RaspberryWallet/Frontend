@@ -1,4 +1,5 @@
 import React, {Fragment, Component} from 'react'
+import {serverUrl} from '../../../config'
 
 export default class extends Component {
     state = {
@@ -10,7 +11,7 @@ export default class extends Component {
     }
 
     async fetchModuleState() {
-        const response = await fetch(`http://localhost:9090/moduleState/${this.props.id}`);
+        const response = await fetch(`${serverUrl}/api/moduleState/${this.props.id}`);
         const moduleState = await response.json();
         this.setState({moduleState});
     }
@@ -23,9 +24,9 @@ export default class extends Component {
             <Fragment>
                 <h1>{name}</h1>
                 <h3>{id}</h3>
-                <h3>{moduleState && <span>{moduleState.state}</span>} {moduleState && moduleState.message && <span>{moduleState.message}</span>}</h3>
                 <p>{description}</p>
 
+                <h3>{moduleState && <span>{moduleState.state}</span>} {moduleState && moduleState.message && <span>{moduleState.message}</span>}</h3>
 
             </Fragment>
         )
