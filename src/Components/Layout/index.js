@@ -29,7 +29,7 @@ const styles = theme => ({
     },
     appBar: {
         zIndex: theme.zIndex.drawer + 1,
-        position: 'absolute',
+        position: 'fixed',
     },
     navIconHide: {
         [theme.breakpoints.up('md')]: {
