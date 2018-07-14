@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.raspberrywallet.grpc";
+option java_outer_classname = "GRPCProto";
+package raspberrywallet;
+
+// The greeting service definition.
+service RaspberryWalletServer {
+  rpc Ping (Empty) returns (PingResponse) {}
+
+  // Sends a greeting
+  rpc GetModules (Empty) returns (ModulesResponse) {}
+
+  rpc GetModuleState (ModuleRequest) returns (stream ModuleState) {}
+}
+
+message Empty {}
+
+message PingResponse {
+    string response = 1;
+}
+
+message ModulesResponse {
+    repeated Module modules = 1;
+}
+
+message Module {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+}
+
+message ModuleRequest {
+    string moduleId = 1;
+}
+
+message ModuleState {
+    string state = 1;
+    string message = 2;
+}
