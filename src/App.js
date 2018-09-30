@@ -1,7 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
 import Modules from './Components/Modules'
-import NotFound from './Components/Errors/404'
+import NotFound from './Components/Errors/NotFound'
 import Layout from './Components/Layout'
 import Home from './Components/Home'
 import {serverUrl} from './config'
