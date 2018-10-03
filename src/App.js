@@ -30,7 +30,6 @@ class App extends Component {
         console.log(`fetching modules`);
         const response = await fetch(serverUrl + '/api/modules');
         const modules = await response.json();
-        console.log(`fetched modules ${JSON.stringify(modules)}`);
         this.setState({modules});
     }
 
