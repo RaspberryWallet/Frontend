@@ -20,5 +20,5 @@
     "recompose": "latest",
     "url-parse": "^1.4.3"
   },
-  "proxy": "http://localhost:8080"
+  "proxy": "http://localhost:9090"
 }

@@ -1,7 +1,9 @@
 import React, {Component, Fragment} from 'react'
 import {serverUrl} from '../config'
-import {Card, CardContent, Typography, CardActions, Button} from "@material-ui/core";
+import {Typography, Button} from "@material-ui/core";
 import {withStyles} from '@material-ui/core/styles';
+import RestoreDialog from './Dialog/RestoreDialog'
+import SendCoinsDialog from './Dialog/SendCoinsDialog'
 
 const styles = {
     card: {
@@ -18,33 +20,25 @@ const styles = {
 };
 
 class App extends Component {
+
     state = {
-        ping: null,
-        moduleStates: {},
-        moduleUis: {},
-        inputResponse: {}
+        currentAddress: null,
+        estimatedBalance: null,
+        availableBalance: null,
+        cpuTemp: null,
+        isLocked: true,
+        openRestoreDialog: false,
+        openSendDialog: false,
     };
-
-    constructor(props) {
-        super(props);
-        this.moduleInputs = {};
-
-        if (props.modules) {
-            props.modules.forEach(module => this.fetchModuleState(module.id));
-            props.modules.forEach(module => this.fetchModuleUi(module.id));
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.modules)
-            nextProps.modules.forEach(module => {
-                this.fetchModuleState(module.id);
-                this.fetchModuleUi(module.id);
-            })
-    }
 
     componentDidMount() {
         this.fetchPing();
+        if (!this.state.isLocked) {
+            this.fetchCurrentAddress();
+            this.fetchEstimatedBalance();
+            this.fetchAvailableBalance();
+        }
+        //this.fetchCpuTemp();
     }
 
     async fetchPing() {
@@ -54,81 +48,136 @@ class App extends Component {
         console.log(`fetched ping ${JSON.stringify(ping)}`);
     }
 
-    async fetchModuleState(id) {
-        const response = await fetch(`${serverUrl}/api/moduleState/${id}`);
-        const moduleState = await response.json();
-        this.setState(state => state.moduleStates[id] = moduleState);
+    async fetchCurrentAddress() {
+        console.log(`fetching current address`);
+        const response = await fetch(serverUrl + '/api/currentAddress');
+        let currentAddress = await response.json();
+        currentAddress = currentAddress.currentAddress;
+        console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
+        this.setState({currentAddress})
     }
 
-    async fetchModuleUi(id) {
-        const response = await fetch(`${serverUrl}/api/moduleHtmlUi/${id}`);
-        const htmlUi = await response.text();
-        this.setState(state => state.moduleUis[id] = htmlUi);
+    async fetchFreshAddress() {
+        console.log(`fetching fresh address`);
+        const response = await fetch(serverUrl + '/api/freshAddress');
+        let currentAddress = await response.json();
+        currentAddress = currentAddress.freshAddress;
+        console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
+        this.setState({currentAddress})
     }
 
-    async submitModuleInput(id, inputs) {
-        console.log(`id: ${id} inputs: ${JSON.stringify(inputs)}`);
-        const response = await fetch(`${serverUrl}/api/nextStep/${id}`, {
-            method: 'POST',
-            body: JSON.stringify(inputs)
-        });
-        const responseJson = await response.json();
-        this.setState(state => state.inputResponse[id] = responseJson);
-        this.fetchModuleState(id);
+
+    async fetchEstimatedBalance() {
+        console.log(`fetching estimated balance`);
+        const response = await fetch(serverUrl + '/api/estimatedBalance');
+        let estimatedBalance = await response.json();
+        estimatedBalance = estimatedBalance.estimatedBalance;
+        console.log(`estimatedBalance ${JSON.stringify(estimatedBalance)}`);
+        this.setState({estimatedBalance})
     }
 
+    async fetchAvailableBalance() {
+        console.log(`fetching available balance`);
+        const response = await fetch(serverUrl + '/api/availableBalance');
+        let availableBalance = await response.json();
+        availableBalance = availableBalance.availableBalance;
+        console.log(`available balance ${JSON.stringify(availableBalance)}`);
+        this.setState({availableBalance})
+    }
+
+    async fetchCpuTemp() {
+        console.log(`fetching cpu temp`);
+        const response = await fetch(serverUrl + '/api/cpuTemp');
+        let cpuTemp = await response.json();
+        cpuTemp = cpuTemp.cpuTemp;
+        console.log(`available balance ${JSON.stringify(cpuTemp)}`);
+        this.setState({cpuTemp})
+    }
+
+    async fetchIsLocked() {
+        console.log(`fetching is locked`);
+        const response = await fetch(serverUrl + '/api/isLocked');
+        let isLocked = await response.json();
+        isLocked = isLocked.isLocked;
+        console.log(`islocked ${JSON.stringify(isLocked)}`);
+        this.setState({isLocked})
+    }
+
+    async unlockWallet() {
+        console.log(`fetching unlockWallet`);
+        const response = await fetch(serverUrl + '/api/unlockWallet');
+        let responseText = await response.text();
+        console.log(`unlockWallet ${responseText}`);
+    }
+
+
+    handleClickRestore = () => {
+        this.setState({openRestoreDialog: true});
+    };
+    handleCloseRestoreDialog = () => {
+        this.setState({openRestoreDialog: false});
+    };
+    handleClickSend = () => {
+        this.setState({openSendDialog: true});
+    };
+    handleCloseSendDialog = () => {
+        this.setState({openSendDialog: false});
+    };
 
     render() {
         console.log("render");
         const {modules, classes} = this.props;
 
+        const {isLocked, currentAddress, estimatedBalance, availableBalance, cpuTemp} = this.state;
+
         return (
             <Fragment>
-                {modules && modules.map(module => {
 
-                        return <Card key={module.id} className={classes.card}>
-                            <CardContent>
-                                <Typography variant="headline" component="h2">
-                                    {module.name}
-                                </Typography>
-                                <Typography className={classes.pos} color="textSecondary">
-                                    {module.id}
-                                </Typography>
-                                <Typography component="p">
-                                    {module.description}
-                                </Typography>
-                                <Typography color="textSecondary">
-                                    {this.state.moduleStates[module.id] && this.state.moduleStates[module.id].state} {this.state.moduleStates[module.id] && this.state.moduleStates[module.id].message}
-                                </Typography>
-                                {this.state.moduleUis[module.id] &&
-                                <form>
-                                    <div ref={element => this.moduleInputs[module.id] = element}
-                                         dangerouslySetInnerHTML={{__html: this.state.moduleUis[module.id]}}/>
+                <Typography variant="headline" component="h2">
+                    {`Receive Address: ${currentAddress}`}
+                </Typography>
+                {!isLocked &&
+                <Button size="small" onClick={() => {
+                    this.fetchFreshAddress()
+                }}>Refresh Address</Button>
+                }
 
-                                    <Button onClick={() => {
-                                        let inputs = {};
-                                        this.moduleInputs[module.id].childNodes
-                                            .forEach((node) => inputs[node.name] = node.value);
-                                        this.submitModuleInput(module.id, inputs)
-                                    }}>Submit</Button>
-                                </form>}
+                <Typography variant="headline" component="h2">
+                    {`Balance: ${availableBalance}(${estimatedBalance})`}
+                </Typography>
+                {!isLocked &&
+                <Button size="small" onClick={() => {
+                    this.fetchEstimatedBalance();
+                    this.fetchAvailableBalance();
+                }}>Refresh Balances</Button>
+                }
 
-                                {this.state.inputResponse[module.id] &&
-                                <Typography component="p">
-                                    {`Response: ${this.state.inputResponse[module.id].response}`}
-                                </Typography>}
+                {cpuTemp && <Typography variant="headline" component="h2">
+                    {cpuTemp}
+                </Typography>}
 
-                            </CardContent>
+                <Button size="small" onClick={this.unlockWallet}>Unlock Wallet</Button>
+                <Button size="small" onClick={() => this.fetchIsLocked()}>Refresh Status</Button>
 
-                            <CardActions>
-                                <Button size="small" color="secondary">Details</Button>
-                                <Button size="small" onClick={() => {
-                                    this.fetchModuleState(module.id)
-                                }}>Refresh</Button>
-                            </CardActions>
-                        </Card>
-                    }
-                )}
+                {!isLocked &&
+                <Button size="small" onClick={this.handleClickRestore}>Init/Restore</Button>
+                }
+
+                <Button size="small" onClick={this.handleClickSend}>Send</Button>
+
+                {!isLocked &&
+                <RestoreDialog
+                    open={this.state.openRestoreDialog}
+                    onClose={this.handleCloseRestoreDialog}
+                    modules={modules}
+                    aria-labelledby="form-dialog-title"/>
+                }
+                {!isLocked &&
+                <SendCoinsDialog
+                    open={this.state.openSendDialog}
+                    onClose={this.handleCloseSendDialog}
+                />
+                }
 
             </Fragment>
         )
