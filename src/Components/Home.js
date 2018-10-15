@@ -159,19 +159,20 @@ class App extends Component {
                 <Button size="small" onClick={this.unlockWallet}>Unlock Wallet</Button>
                 <Button size="small" onClick={() => this.fetchIsLocked()}>Refresh Status</Button>
 
-                {!isLocked &&
+
                 <Button size="small" onClick={this.handleClickRestore}>Init/Restore</Button>
-                }
+
 
                 <Button size="small" onClick={this.handleClickSend}>Send</Button>
 
-                {!isLocked &&
+
                 <RestoreDialog
                     open={this.state.openRestoreDialog}
                     onClose={this.handleCloseRestoreDialog}
                     modules={modules}
                     aria-labelledby="form-dialog-title"/>
-                }
+
+
                 {!isLocked &&
                 <SendCoinsDialog
                     open={this.state.openSendDialog}

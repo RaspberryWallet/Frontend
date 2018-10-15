@@ -43,7 +43,7 @@ class SendCoinsDialog extends Component {
     };
 
     render() {
-        let {onClose,open} = this.props;
+        let {onClose, open} = this.props;
         return (
             <Dialog
                 open={open}

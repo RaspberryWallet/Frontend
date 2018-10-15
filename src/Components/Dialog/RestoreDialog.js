@@ -73,7 +73,6 @@ class RestoreDialog extends Component {
         });
         if (response.ok) {
             console.log(`sending restore`);
-            this.handleCloseRestoreDialog();
         } else {
             console.error(response.error());
         }
