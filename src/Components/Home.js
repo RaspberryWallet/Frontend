@@ -26,14 +26,15 @@ class App extends Component {
         estimatedBalance: null,
         availableBalance: null,
         cpuTemp: null,
-        isLocked: true,
+        walletStatus: "UNSET",
         openRestoreDialog: false,
         openSendDialog: false,
     };
 
     componentDidMount() {
         this.fetchPing();
-        if (!this.state.isLocked) {
+        this.walletStatus();
+        if (this.state.walletStatus !== "UNSET") {
             this.fetchCurrentAddress();
             this.fetchEstimatedBalance();
             this.fetchAvailableBalance();
@@ -94,14 +95,6 @@ class App extends Component {
         this.setState({cpuTemp})
     }
 
-    async fetchIsLocked() {
-        console.log(`fetching is locked`);
-        const response = await fetch(serverUrl + '/api/isLocked');
-        let isLocked = await response.json();
-        isLocked = isLocked.isLocked;
-        console.log(`islocked ${JSON.stringify(isLocked)}`);
-        this.setState({isLocked})
-    }
 
     async unlockWallet() {
         console.log(`fetching unlockWallet`);
@@ -110,73 +103,83 @@ class App extends Component {
         console.log(`unlockWallet ${responseText}`);
     }
 
+    async walletStatus() {
+        console.log(`fetching walletStatus`);
+        const response = await fetch(serverUrl + '/api/walletStatus');
+        let walletStatus = await response.json();
+        walletStatus = walletStatus.walletStatus;
+        console.log(`walletStatus ${JSON.stringify(walletStatus)}`);
+        this.setState({walletStatus})
+    }
 
-    handleClickRestore = () => {
+
+    handleClickRestore() {
         this.setState({openRestoreDialog: true});
-    };
-    handleCloseRestoreDialog = () => {
+    }
+
+    handleCloseRestoreDialog() {
         this.setState({openRestoreDialog: false});
-    };
-    handleClickSend = () => {
+    }
+
+    handleClickSend() {
         this.setState({openSendDialog: true});
-    };
-    handleCloseSendDialog = () => {
+    }
+
+    handleCloseSendDialog() {
         this.setState({openSendDialog: false});
-    };
+    }
 
     render() {
         console.log("render");
-        const {modules, classes} = this.props;
+        const {modules} = this.props;
 
-        const {isLocked, currentAddress, estimatedBalance, availableBalance, cpuTemp} = this.state;
+        const {walletStatus, currentAddress, estimatedBalance, availableBalance, cpuTemp} = this.state;
 
         return (
             <Fragment>
+                <Typography variant="headline" component="h2">
+                    {`Status: ${walletStatus}`}
+                </Typography>
+
+                <Typography variant="headline" component="h2">
+                    {`CpuTemp: ${cpuTemp}`}
+                </Typography>
+                <Button size="small" onClick={() => this.fetchCpuTemp()}>Refresh Temp</Button>
 
                 <Typography variant="headline" component="h2">
                     {`Receive Address: ${currentAddress}`}
                 </Typography>
-                {!isLocked &&
-                <Button size="small" onClick={() => {
-                    this.fetchFreshAddress()
-                }}>Refresh Address</Button>
-                }
+
+                {walletStatus !== "UNSET" &&
+                <Button size="small" onClick={() => this.fetchFreshAddress()}>Refresh Address</Button>}
 
                 <Typography variant="headline" component="h2">
                     {`Balance: ${availableBalance}(${estimatedBalance})`}
                 </Typography>
-                {!isLocked &&
+
+                {walletStatus !== "UNSET" &&
                 <Button size="small" onClick={() => {
                     this.fetchEstimatedBalance();
                     this.fetchAvailableBalance();
                 }}>Refresh Balances</Button>
                 }
 
-                {cpuTemp && <Typography variant="headline" component="h2">
-                    {cpuTemp}
-                </Typography>}
-
-                <Button size="small" onClick={this.unlockWallet}>Unlock Wallet</Button>
-                <Button size="small" onClick={() => this.fetchIsLocked()}>Refresh Status</Button>
-
-
-                <Button size="small" onClick={this.handleClickRestore}>Init/Restore</Button>
-
-
-                <Button size="small" onClick={this.handleClickSend}>Send</Button>
-
+                <Button size="small" onClick={() => this.unlockWallet()}>Unlock Wallet</Button>
+                <Button size="small" onClick={() => this.walletStatus()}>Refresh Status</Button>
+                <Button size="small" onClick={() => this.handleClickRestore()}>Init/Restore</Button>
+                <Button size="small" onClick={() => this.handleClickSend()}>Send</Button>
 
                 <RestoreDialog
                     open={this.state.openRestoreDialog}
-                    onClose={this.handleCloseRestoreDialog}
+                    onClose={() => this.handleCloseRestoreDialog()}
                     modules={modules}
                     aria-labelledby="form-dialog-title"/>
 
 
-                {!isLocked &&
+                {walletStatus !== "UNSET" &&
                 <SendCoinsDialog
                     open={this.state.openSendDialog}
-                    onClose={this.handleCloseSendDialog}
+                    onClose={() => this.handleCloseSendDialog()}
                 />
                 }
 

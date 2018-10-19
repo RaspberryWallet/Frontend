@@ -35,8 +35,8 @@ class RestoreDialog extends Component {
 
     state = {
         moduleSelectionState: new Map(),
-        mnemonicWords: null,
-        required: null
+        mnemonicWords: "",
+        required: ""
     };
 
     handleSelectedModuleChange = moduleId => event => {
@@ -105,7 +105,7 @@ class RestoreDialog extends Component {
                         fullWidth
                     />
                     {modules && modules.map(module => {
-                        return <Fragment>
+                        return <Fragment key={module.id}>
                             <FormControlLabel
                                 control={
                                     <Checkbox
