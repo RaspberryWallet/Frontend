@@ -102,6 +102,12 @@ class App extends Component {
         let responseText = await response.text();
         console.log(`unlockWallet ${responseText}`);
     }
+    async lockWallet() {
+        console.log(`fetching lockWallet`);
+        const response = await fetch(serverUrl + '/api/lockWallet');
+        let responseText = await response.text();
+        console.log(`lockWallet ${responseText}`);
+    }
 
     async walletStatus() {
         console.log(`fetching walletStatus`);
@@ -165,6 +171,7 @@ class App extends Component {
                 }
 
                 <Button size="small" onClick={() => this.unlockWallet()}>Unlock Wallet</Button>
+                <Button size="small" onClick={() => this.lockWallet()}>Lock Wallet</Button>
                 <Button size="small" onClick={() => this.walletStatus()}>Refresh Status</Button>
                 <Button size="small" onClick={() => this.handleClickRestore()}>Init/Restore</Button>
                 <Button size="small" onClick={() => this.handleClickSend()}>Send</Button>
