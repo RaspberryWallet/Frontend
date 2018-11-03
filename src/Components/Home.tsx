@@ -1,37 +1,42 @@
-import React, {Component, Fragment} from 'react'
-import {serverUrl} from '../config'
-import {Typography, Button} from "@material-ui/core";
+import {Button, Typography} from "@material-ui/core";
 import {withStyles} from '@material-ui/core/styles';
+import * as React from 'react'
+import {Component, Fragment} from "react";
+import {serverUrl} from '../config'
 import RestoreDialog from './Dialog/RestoreDialog'
 import SendCoinsDialog from './Dialog/SendCoinsDialog'
 
 const styles = {
-    card: {
-        minWidth: 275,
-    },
     bullet: {
         display: 'inline-block',
         margin: '0 2px',
         transform: 'scale(0.8)',
+    },
+    card: {
+        minWidth: 275,
     },
     pos: {
         marginBottom: 12,
     },
 };
 
-class App extends Component {
+interface IAppProps {
+    modules: Module[];
+}
 
-    state = {
-        currentAddress: null,
-        estimatedBalance: null,
+class App extends Component<IAppProps, {}> {
+
+    public state = {
         availableBalance: null,
         cpuTemp: null,
-        walletStatus: "UNSET",
+        currentAddress: null,
+        estimatedBalance: null,
         openRestoreDialog: false,
         openSendDialog: false,
+        walletStatus: "UNSET",
     };
 
-    componentDidMount() {
+    public componentDidMount() {
         this.fetchPing();
         this.walletStatus();
         if (this.state.walletStatus !== "UNSET") {
@@ -39,103 +44,9 @@ class App extends Component {
             this.fetchEstimatedBalance();
             this.fetchAvailableBalance();
         }
-        //this.fetchCpuTemp();
     }
 
-    async fetchPing() {
-        console.log(`fetching pings`);
-        const response = await fetch(serverUrl + '/api/ping');
-        const ping = await response.json();
-        console.log(`fetched ping ${JSON.stringify(ping)}`);
-    }
-
-    async fetchCurrentAddress() {
-        console.log(`fetching current address`);
-        const response = await fetch(serverUrl + '/api/currentAddress');
-        let currentAddress = await response.json();
-        currentAddress = currentAddress.currentAddress;
-        console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
-        this.setState({currentAddress})
-    }
-
-    async fetchFreshAddress() {
-        console.log(`fetching fresh address`);
-        const response = await fetch(serverUrl + '/api/freshAddress');
-        let currentAddress = await response.json();
-        currentAddress = currentAddress.freshAddress;
-        console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
-        this.setState({currentAddress})
-    }
-
-
-    async fetchEstimatedBalance() {
-        console.log(`fetching estimated balance`);
-        const response = await fetch(serverUrl + '/api/estimatedBalance');
-        let estimatedBalance = await response.json();
-        estimatedBalance = estimatedBalance.estimatedBalance;
-        console.log(`estimatedBalance ${JSON.stringify(estimatedBalance)}`);
-        this.setState({estimatedBalance})
-    }
-
-    async fetchAvailableBalance() {
-        console.log(`fetching available balance`);
-        const response = await fetch(serverUrl + '/api/availableBalance');
-        let availableBalance = await response.json();
-        availableBalance = availableBalance.availableBalance;
-        console.log(`available balance ${JSON.stringify(availableBalance)}`);
-        this.setState({availableBalance})
-    }
-
-    async fetchCpuTemp() {
-        console.log(`fetching cpu temp`);
-        const response = await fetch(serverUrl + '/api/cpuTemp');
-        let cpuTemp = await response.json();
-        cpuTemp = cpuTemp.cpuTemp;
-        console.log(`available balance ${JSON.stringify(cpuTemp)}`);
-        this.setState({cpuTemp})
-    }
-
-
-    async unlockWallet() {
-        console.log(`fetching unlockWallet`);
-        const response = await fetch(serverUrl + '/api/unlockWallet');
-        let responseText = await response.text();
-        console.log(`unlockWallet ${responseText}`);
-    }
-    async lockWallet() {
-        console.log(`fetching lockWallet`);
-        const response = await fetch(serverUrl + '/api/lockWallet');
-        let responseText = await response.text();
-        console.log(`lockWallet ${responseText}`);
-    }
-
-    async walletStatus() {
-        console.log(`fetching walletStatus`);
-        const response = await fetch(serverUrl + '/api/walletStatus');
-        let walletStatus = await response.json();
-        walletStatus = walletStatus.walletStatus;
-        console.log(`walletStatus ${JSON.stringify(walletStatus)}`);
-        this.setState({walletStatus})
-    }
-
-
-    handleClickRestore() {
-        this.setState({openRestoreDialog: true});
-    }
-
-    handleCloseRestoreDialog() {
-        this.setState({openRestoreDialog: false});
-    }
-
-    handleClickSend() {
-        this.setState({openSendDialog: true});
-    }
-
-    handleCloseSendDialog() {
-        this.setState({openSendDialog: false});
-    }
-
-    render() {
+    public render() {
         console.log("render");
         const {modules} = this.props;
 
@@ -150,35 +61,32 @@ class App extends Component {
                 <Typography variant="headline" component="h2">
                     {`CpuTemp: ${cpuTemp}`}
                 </Typography>
-                <Button size="small" onClick={() => this.fetchCpuTemp()}>Refresh Temp</Button>
+                <Button size="small" onClick={this.fetchCpuTemp}>Refresh Temp</Button>
 
                 <Typography variant="headline" component="h2">
                     {`Receive Address: ${currentAddress}`}
                 </Typography>
 
                 {walletStatus !== "UNSET" &&
-                <Button size="small" onClick={() => this.fetchFreshAddress()}>Refresh Address</Button>}
+                <Button size="small" onClick={this.fetchFreshAddress}>Refresh Address</Button>}
 
                 <Typography variant="headline" component="h2">
                     {`Balance: ${availableBalance}(${estimatedBalance})`}
                 </Typography>
 
                 {walletStatus !== "UNSET" &&
-                <Button size="small" onClick={() => {
-                    this.fetchEstimatedBalance();
-                    this.fetchAvailableBalance();
-                }}>Refresh Balances</Button>
+                <Button size="small" onClick={this.refreshBalances}>Refresh Balances</Button>
                 }
 
-                <Button size="small" onClick={() => this.unlockWallet()}>Unlock Wallet</Button>
-                <Button size="small" onClick={() => this.lockWallet()}>Lock Wallet</Button>
-                <Button size="small" onClick={() => this.walletStatus()}>Refresh Status</Button>
-                <Button size="small" onClick={() => this.handleClickRestore()}>Init/Restore</Button>
-                <Button size="small" onClick={() => this.handleClickSend()}>Send</Button>
+                <Button size="small" onClick={this.unlockWallet}>Unlock Wallet</Button>
+                <Button size="small" onClick={this.lockWallet}>Lock Wallet</Button>
+                <Button size="small" onClick={this.walletStatus}>Refresh Status</Button>
+                <Button size="small" onClick={this.handleClickRestore}>Init/Restore</Button>
+                <Button size="small" onClick={this.handleClickSend}>Send</Button>
 
                 <RestoreDialog
                     open={this.state.openRestoreDialog}
-                    onClose={() => this.handleCloseRestoreDialog()}
+                    onClose={this.handleCloseRestoreDialog}
                     modules={modules}
                     aria-labelledby="form-dialog-title"/>
 
@@ -186,12 +94,111 @@ class App extends Component {
                 {walletStatus !== "UNSET" &&
                 <SendCoinsDialog
                     open={this.state.openSendDialog}
-                    onClose={() => this.handleCloseSendDialog()}
+                    onClose={this.handleCloseSendDialog}
                 />
                 }
 
             </Fragment>
         )
+    }
+
+    private fetchPing = async () => {
+        console.log(`fetching pings`);
+        const response = await fetch(serverUrl + '/api/ping');
+        const ping = await response.json();
+        console.log(`fetched ping ${JSON.stringify(ping)}`);
+    };
+
+    private fetchCurrentAddress = async () => {
+        console.log(`fetching current address`);
+        const response = await fetch(serverUrl + '/api/currentAddress');
+        let currentAddress = await response.json();
+        currentAddress = currentAddress.currentAddress;
+        console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
+        this.setState({currentAddress})
+    }
+
+    private fetchFreshAddress = async () => {
+        console.log(`fetching fresh address`);
+        const response = await fetch(serverUrl + '/api/freshAddress');
+        let currentAddress = await response.json();
+        currentAddress = currentAddress.freshAddress;
+        console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
+        this.setState({currentAddress})
+    };
+
+
+    private fetchEstimatedBalance = async () => {
+        console.log(`fetching estimated balance`);
+        const response = await fetch(serverUrl + '/api/estimatedBalance');
+        let estimatedBalance = await response.json();
+        estimatedBalance = estimatedBalance.estimatedBalance;
+        console.log(`estimatedBalance ${JSON.stringify(estimatedBalance)}`);
+        this.setState({estimatedBalance})
+    };
+
+    private fetchAvailableBalance = async () => {
+        console.log(`fetching available balance`);
+        const response = await fetch(serverUrl + '/api/availableBalance');
+        let availableBalance = await response.json();
+        availableBalance = availableBalance.availableBalance;
+        console.log(`available balance ${JSON.stringify(availableBalance)}`);
+        this.setState({availableBalance})
+    };
+
+    private fetchCpuTemp = async () => {
+        console.log(`fetching cpu temp`);
+        const response = await fetch(serverUrl + '/api/cpuTemp');
+        let cpuTemp = await response.json();
+        cpuTemp = cpuTemp.cpuTemp;
+        console.log(`available balance ${JSON.stringify(cpuTemp)}`);
+        this.setState({cpuTemp})
+    };
+
+
+    private unlockWallet = async () => {
+        console.log(`fetching unlockWallet`);
+        const response = await fetch(serverUrl + '/api/unlockWallet');
+        const responseText = await response.text();
+        console.log(`unlockWallet ${responseText}`);
+    };
+
+    private lockWallet = async () => {
+        console.log(`fetching lockWallet`);
+        const response = await fetch(serverUrl + '/api/lockWallet');
+        const responseText = await response.text();
+        console.log(`lockWallet ${responseText}`);
+    };
+
+    private walletStatus = async () => {
+        console.log(`fetching walletStatus`);
+        const response = await fetch(serverUrl + '/api/walletStatus');
+        let walletStatus = await response.json();
+        walletStatus = walletStatus.walletStatus;
+        console.log(`walletStatus ${JSON.stringify(walletStatus)}`);
+        this.setState({walletStatus})
+    };
+
+    private refreshBalances = () => {
+        this.fetchEstimatedBalance();
+        this.fetchAvailableBalance();
+    };
+
+
+    private handleClickRestore = () => {
+        this.setState({openRestoreDialog: true});
+    };
+
+    private handleCloseRestoreDialog = () => {
+        this.setState({openRestoreDialog: false});
+    };
+
+    private handleClickSend = () => {
+        this.setState({openSendDialog: true});
+    };
+
+    private handleCloseSendDialog = () => {
+        this.setState({openSendDialog: false});
     }
 
 }

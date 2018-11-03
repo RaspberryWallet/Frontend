@@ -1,12 +1,13 @@
-import React, {Component, Fragment} from 'react';
+import {indigo, yellow} from '@material-ui/core/colors';
+import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
+import * as React from 'react';
+// @ts-ignore
 import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
-import Modules from './Components/Modules'
 import NotFound from './Components/Errors/NotFound'
-import Layout from './Components/Layout'
 import Home from './Components/Home'
+import Layout from './Components/Layout'
+import Modules from './Components/Modules/index'
 import {serverUrl} from './config'
-import {MuiThemeProvider, createMuiTheme} from '@material-ui/core/styles';
-import {blue,yellow, indigo} from '@material-ui/core/colors';
 
 const theme = createMuiTheme({
     palette: {
@@ -16,25 +17,18 @@ const theme = createMuiTheme({
     }
 });
 
-class App extends Component {
+class App extends React.Component {
 
-    state = {
+    private state = {
         modules: null,
     };
 
-    componentDidMount() {
+    public componentDidMount() {
         this.fetchModules();
     }
 
-    async fetchModules() {
-        console.log(`fetching modules`);
-        const response = await fetch(serverUrl + '/api/modules');
-        const modules = await response.json();
-        this.setState({modules});
-    }
 
-
-    render() {
+    public render() {
         const {modules} = this.state;
 
         return (
@@ -43,9 +37,9 @@ class App extends Component {
                     <Layout modules={modules}>
 
                         <Switch>
-                            <Route exact path="/" render={props => <Home {...props} modules={modules}/>}/>
+                            <Route exact={true} path="/" render={(props: any) => <Home {...props} modules={modules}/>}/>
                             <Route path="/modules" render={
-                                props => <Modules {...props} modules={modules}/>
+                                (props: any) => <Modules {...props} modules={modules}/>
                             }/>
                             <Route component={NotFound}/>
                         </Switch>
@@ -54,6 +48,13 @@ class App extends Component {
                 </MuiThemeProvider>
             </BrowserRouter>
         );
+    }
+
+    private async fetchModules() {
+        console.log(`fetching modules`);
+        const response = await fetch(serverUrl + '/api/modules');
+        const modules = await response.json();
+        this.setState({modules});
     }
 }
 

@@ -26,7 +26,7 @@ const styles = {
 };
 
 
-class RestoreDialog extends Component {
+class UnlockDialog extends Component {
 
     constructor(props) {
         super(props);
@@ -34,9 +34,7 @@ class RestoreDialog extends Component {
     }
 
     state = {
-        moduleSelectionState: new Map(),
-        mnemonicWords: "",
-        required: ""
+        moduleSelectionState: new Map()
     };
 
     handleSelectedModuleChange = moduleId => event => {
@@ -151,4 +149,4 @@ class RestoreDialog extends Component {
     }
 }
 
-export default withStyles(styles)(RestoreDialog)
+export default withStyles(styles)(UnlockDialog)
