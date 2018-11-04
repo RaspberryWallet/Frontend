@@ -1,10 +1,12 @@
-import {Button, Typography} from "@material-ui/core";
+import {Button, Typography, WithStyles} from "@material-ui/core";
 import {withStyles} from '@material-ui/core/styles';
 import * as React from 'react'
 import {Component, Fragment} from "react";
 import {serverUrl} from '../config'
+import Module from "../Models/Module";
 import RestoreDialog from './Dialog/RestoreDialog'
 import SendCoinsDialog from './Dialog/SendCoinsDialog'
+import UnlockDialog from "./Dialog/UnlockDialog";
 
 const styles = {
     bullet: {
@@ -20,19 +22,31 @@ const styles = {
     },
 };
 
-interface IAppProps {
+interface IAppProps extends WithStyles<typeof styles> {
     modules: Module[];
 }
 
-class App extends Component<IAppProps, {}> {
+interface IAppState {
+    currentAddress: string | null;
+    cpuTemp: string | null;
+    availableBalance: string | null;
+    estimatedBalance: string | null;
+    walletStatus: "UNSET" | "ENCRYPTED" | "DECRYPTED";
+    openRestoreDialog: boolean;
+    openSendDialog: boolean;
+    openUnlockDialog: boolean;
+}
 
-    public state = {
+class App extends Component<IAppProps, IAppState> {
+
+    public state: IAppState = {
         availableBalance: null,
         cpuTemp: null,
         currentAddress: null,
         estimatedBalance: null,
         openRestoreDialog: false,
         openSendDialog: false,
+        openUnlockDialog: false,
         walletStatus: "UNSET",
     };
 
@@ -89,7 +103,11 @@ class App extends Component<IAppProps, {}> {
                     onClose={this.handleCloseRestoreDialog}
                     modules={modules}
                     aria-labelledby="form-dialog-title"/>
-
+                <UnlockDialog
+                    open={this.state.openUnlockDialog}
+                    onClose={this.handleCloseUnlockDialog}
+                    modules={modules}
+                    aria-labelledby="form-dialog-title"/>
 
                 {walletStatus !== "UNSET" &&
                 <SendCoinsDialog
@@ -156,12 +174,6 @@ class App extends Component<IAppProps, {}> {
     };
 
 
-    private unlockWallet = async () => {
-        console.log(`fetching unlockWallet`);
-        const response = await fetch(serverUrl + '/api/unlockWallet');
-        const responseText = await response.text();
-        console.log(`unlockWallet ${responseText}`);
-    };
 
     private lockWallet = async () => {
         console.log(`fetching lockWallet`);
@@ -191,6 +203,13 @@ class App extends Component<IAppProps, {}> {
 
     private handleCloseRestoreDialog = () => {
         this.setState({openRestoreDialog: false});
+    };
+
+    private unlockWallet = async () => {
+        this.setState({openUnlockDialog: true});
+    };
+    private handleCloseUnlockDialog = () => {
+        this.setState({openUnlockDialog: false});
     };
 
     private handleClickSend = () => {

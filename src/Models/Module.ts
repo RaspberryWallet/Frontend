@@ -1,4 +1,4 @@
-class Module{
+export default class Module{
     public id: string;
     public name: string;
     public description : string;

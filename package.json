@@ -11,11 +11,12 @@
   "dependencies": {
     "@material-ui/core": "^3.3.2",
     "@material-ui/icons": "^3.0.1",
+
     "axios": "^0.18.0",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
-    "react-scripts-ts": "3.1.0",
     "react-router-dom": "^4.3.1",
+    "react-scripts-ts": "3.1.0",
     "react-toastify": "^4.0.2",
     "recompose": "latest",
     "url-parse": "^1.4.3",
@@ -24,11 +25,12 @@
   "devDependencies": {
     "@types/hls.js": "^0.10.2",
     "@types/jest": "^23.3.9",
-    "@types/node": "^10.12.1",
+    "@types/node": "^10.12.2",
     "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.9",
-    "typescript": "^3.1.5"
+    "@types/react-router-dom": "^4.3.1",
+    "@types/recompose": "^0.27.0",
+    "typescript": "^3.1.6"
   },
-
   "proxy": "http://localhost:9090"
 }

@@ -5,9 +5,10 @@ import * as React from 'react';
 import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
 import NotFound from './Components/Errors/NotFound'
 import Home from './Components/Home'
-import Layout from './Components/Layout'
+import Layout from './Components/Layout/index'
 import Modules from './Components/Modules/index'
 import {serverUrl} from './config'
+import Module from './Models/Module'
 
 const theme = createMuiTheme({
     palette: {
@@ -17,11 +18,12 @@ const theme = createMuiTheme({
     }
 });
 
-class App extends React.Component {
 
-    private state = {
-        modules: null,
-    };
+interface IAppState {
+    modules: Module[];
+}
+
+class App extends React.Component<{}, IAppState> {
 
     public componentDidMount() {
         this.fetchModules();
@@ -29,18 +31,16 @@ class App extends React.Component {
 
 
     public render() {
-        const {modules} = this.state;
-
         return (
             <BrowserRouter>
                 <MuiThemeProvider theme={theme}>
-                    <Layout modules={modules}>
+
+                    <Layout
+                        modules={this.state.modules}>
 
                         <Switch>
-                            <Route exact={true} path="/" render={(props: any) => <Home {...props} modules={modules}/>}/>
-                            <Route path="/modules" render={
-                                (props: any) => <Modules {...props} modules={modules}/>
-                            }/>
+                            <Route exact={true} path="/" render={this.renderRootPath}/>
+                            <Route path="/modules" render={this.renderModulesPath}/>
                             <Route component={NotFound}/>
                         </Switch>
 
@@ -49,6 +49,14 @@ class App extends React.Component {
             </BrowserRouter>
         );
     }
+
+    private renderRootPath = (props: any) => {
+        return <Home {...props} modules={this.state.modules}/>;
+    };
+
+    private renderModulesPath = (props: any) => {
+        return <Modules {...props} modules={this.state.modules}/>;
+    };
 
     private async fetchModules() {
         console.log(`fetching modules`);

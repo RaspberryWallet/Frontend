@@ -1,8 +1,11 @@
-import {Button, Card, CardActions, CardContent, Typography, withStyles} from "@material-ui/core";
-import React, {Component, Fragment} from 'react'
+import {Button, Card, CardActions, CardContent, Typography, WithStyles, withStyles} from "@material-ui/core";
+import * as React from 'react'
+import {Component, Fragment} from 'react'
+// @ts-ignore
 import {Link, Redirect, Route, Switch} from "react-router-dom";
 import {serverUrl} from "../../config";
-import Module from './Module/index'
+import Module from '../../Models/Module'
+import ModuleView from './ModuleView/index'
 
 const styles = {
     bullet: {
@@ -18,58 +21,64 @@ const styles = {
     },
 };
 
-interface IModulesProps {
+interface IModulesProps extends WithStyles<typeof styles>{
     classes: any;
     modules: Module[]
     match: any;
 }
+
 interface IModulesState {
     inputResponse: any;
     moduleStates: any;
 }
+
 class Modules extends Component<IModulesProps, IModulesState> {
-    public state = {
-        inputResponse: {},
-        moduleStates: {}
-    };
-    private moduleInputs = {};
+    private moduleInputs: { [name: string]: HTMLDivElement | null } = {};
 
     constructor(props: IModulesProps) {
         super(props);
+        this.state = {
+            inputResponse: {},
+            moduleStates: {}
+        };
 
         if (props.modules) {
             props.modules.forEach(module => this.fetchModuleState(module.id));
         }
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.modules)
+    public componentWillReceiveProps(nextProps: IModulesProps) {
+        if (nextProps.modules) {
             nextProps.modules.forEach(module => {
                 this.fetchModuleState(module.id);
             })
+        }
     }
 
-    async fetchModuleState(id) {
-        const response = await fetch(`${serverUrl}/api/moduleState/${id}`);
-        const moduleState = await response.json();
-        this.setState(state => state.moduleStates[id] = moduleState);
-    }
 
-    async submitModuleInput(id, inputs) {
-        console.log(`id: ${id} inputs: ${JSON.stringify(inputs)}`);
-        const response = await fetch(`${serverUrl}/api/nextStep/${id}`, {
-            method: 'POST',
-            body: JSON.stringify(inputs)
-        });
-        const responseJson = await response.json();
-        this.setState(state => state.inputResponse[id] = responseJson);
-        this.fetchModuleState(id);
+    public render() {
+        const {match: {url}} = this.props;
+        return (
+            <Fragment>
+                <Switch>
+                    <Route exact={true} path={url} render={this.renderExactPath}/>
+
+                    <Route path={`${url}/:moduleId`} render={this.renderModulePath}/>
+                    <Route render={this.renderRedirect}/>
+                </Switch>
+            </Fragment>
+        );
     }
 
     private renderExactPath = () => {
-        if (!modules) return <h3>No modules found</h3>;
-        {
-            return modules.map(module => {
+        const modules: Module[] = this.props.modules;
+        const classes: any = this.props.classes;
+
+        if (!modules) {
+            return <h3>No modules found</h3>;
+        }
+        else {
+            return modules.map((module: Module) => {
                     return <Card key={module.id} className={classes.card}>
                         <CardContent>
                             <Typography variant="headline" component="h2">
@@ -89,12 +98,7 @@ class Modules extends Component<IModulesProps, IModulesState> {
                                 <div ref={element => this.moduleInputs[module.id] = element}
                                      dangerouslySetInnerHTML={{__html: module.htmlUi}}/>
 
-                                <Button onClick={() => {
-                                    let inputs = {};
-                                    this.moduleInputs[module.id].childNodes
-                                        .forEach((node) => inputs[node.name] = node.value);
-                                    this.submitModuleInput(module.id, inputs)
-                                }}>Submit</Button>
+                                <Button onClick={this.handleSubmitClick}>Submit</Button>
 
                             </form>
 
@@ -116,33 +120,53 @@ class Modules extends Component<IModulesProps, IModulesState> {
             )
         }
     };
+    private renderModulePath = (route: any) => {
+        const match = route.match;
 
-    public render() {
-        const {match, modules, classes} = this.props;
-        const {url} = match;
-        return (
-            <Fragment>
-                <Switch>
-                    <Route exact={true} path={url} render={this.renderExactPath}/>
+        const modules: Module[] = this.props.modules;
 
-                    <Route path={`${url}/:moduleId`} render={
-                        ({match}) => {
-                            if (!modules)
-                                return <h3>No module found</h3>;
+        if (!modules) {
+            return <h3>No module found</h3>;
+        }
 
-                            const module = modules.find(module => module.id === match.params.moduleId)
+        const foundModule = modules.find((module: Module) => module.id === match.params.moduleId);
 
-                            if (!module) return <h3>No module found for id {match.params.moduleId}</h3>;
+        if (!foundModule) {
+            return <h3>No module found for id {match.params.moduleId}</h3>;
+        }
+        return <ModuleView {...foundModule}/>
+    };
 
+    private renderRedirect = () => {
+        return <Redirect to="/404"/>
+    };
 
-                            return <Module {...module}/>
+    private handleSubmitClick = () => {
+        const inputs: any = {};
 
-                        }
-                    }/>
-                    <Route render={() => <Redirect to="/404"/>}/>
-                </Switch>
-            </Fragment>
-        );
+        const theModuleInputs = this.moduleInputs[module.id];
+        if (theModuleInputs != null) {
+            theModuleInputs.childNodes
+                .forEach((node: ChildNode) => inputs[node.nodeName] = node.nodeValue);
+        }
+        this.submitModuleInput(module.id, inputs)
+    }
+
+    private async fetchModuleState(id: string) {
+        const response = await fetch(`${serverUrl}/api/moduleState/${id}`);
+        const moduleState = await response.json();
+        this.setState(state => state.moduleStates[id] = moduleState);
+    }
+
+    private async submitModuleInput(id: string, inputs: any) {
+        console.log(`id: ${id} inputs: ${JSON.stringify(inputs)}`);
+        const response = await fetch(`${serverUrl}/api/nextStep/${id}`, {
+            body: JSON.stringify(inputs),
+            method: 'POST'
+        });
+        const responseJson = await response.json();
+        this.setState(state => state.inputResponse[id] = responseJson);
+        this.fetchModuleState(id);
     }
 }
 

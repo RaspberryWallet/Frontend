@@ -1,24 +1,29 @@
-import React, {Component, Fragment} from 'react'
 import {
     AppBar,
-    MenuList,
-    MenuItem,
-    Toolbar,
-    IconButton,
-    Typography,
-    Hidden,
+    CssBaseline,
     Drawer,
-    Divider,
-    List,
-    CssBaseline
+    Hidden,
+    IconButton,
+    MenuItem,
+    MenuList, Theme,
+    Toolbar,
+    Typography, WithStyles
 } from '@material-ui/core'
-import {Menu} from '@material-ui/icons'
 import {withStyles} from '@material-ui/core/styles';
+import createStyles from "@material-ui/core/styles/createStyles";
+import {Menu} from '@material-ui/icons'
+import * as React from 'react'
+import {Component, Fragment} from 'react'
 import {Link, withRouter} from 'react-router-dom'
 import {compose} from 'recompose'
+import Module from "../../Models/Module";
 
 const drawerWidth = 240;
-const styles = theme => ({
+const styles = ({zIndex, breakpoints, spacing, palette, mixins}: Theme) => createStyles({
+    appBar: {
+        zIndex: zIndex.drawer + 1,
+        position: 'fixed',
+    },
     root: {
         flexGrow: 1,
         zIndex: 1,
@@ -27,48 +32,50 @@ const styles = theme => ({
         display: 'flex',
         width: '100%',
     },
-    appBar: {
-        zIndex: theme.zIndex.drawer + 1,
-        position: 'fixed',
-    },
     navIconHide: {
-        [theme.breakpoints.up('md')]: {
+        [breakpoints.up('md')]: {
             display: 'none',
         },
     },
-    toolbar: theme.mixins.toolbar,
+    toolbar: mixins.toolbar,
     drawerPaper: {
         width: drawerWidth,
-        [theme.breakpoints.up('md')]: {
+        [breakpoints.up('md')]: {
             position: 'relative',
         },
     },
     content: {
         flexGrow: 1,
-        backgroundColor: theme.palette.background.default,
-        padding: theme.spacing.unit * 3,
+        backgroundColor: palette.background.default,
+        padding: spacing.unit * 3,
     },
     nested: {
-        paddingLeft: theme.spacing.unit * 4,
+        paddingLeft: spacing.unit * 4,
     },
 });
 
-class Layout extends Component {
+interface ILayoutProps extends WithStyles<typeof styles> {
+    location: any;
+    children: any;
+    modules: Module[];
+}
 
-    state = {
+interface ILayoutState {
+    mobileOpen: boolean;
+}
+
+class Layout extends Component<ILayoutProps, ILayoutState> {
+
+    public state: ILayoutState = {
         mobileOpen: false,
     };
 
-    handleDrawerToggle = () => {
-        this.setState({mobileOpen: !this.state.mobileOpen});
-    };
-
-    render() {
-        const {classes, location: {pathname}, theme, children, modules} = this.props;
+    public render() {
+        const {classes, location: {pathname}, children, modules} = this.props;
 
         const drawer = (
             <div>
-                <Hidden smDown>
+                <Hidden smDown={true}>
                     <div className={classes.toolbar}/>
                 </Hidden>
                 <MenuList>
@@ -117,12 +124,12 @@ class Layout extends Component {
                             >
                                 <Menu/>
                             </IconButton>
-                            <Typography variant="title" color="inherit" noWrap>
+                            <Typography variant="title" color="inherit" noWrap={true}>
                                 Raspberry Wallet
                             </Typography>
                         </Toolbar>
                     </AppBar>
-                    <Hidden mdUp>
+                    <Hidden mdUp={true}>
                         <Drawer
                             variant="temporary"
                             open={this.state.mobileOpen}
@@ -137,10 +144,10 @@ class Layout extends Component {
                             {drawer}
                         </Drawer>
                     </Hidden>
-                    <Hidden smDown implementation="css">
+                    <Hidden smDown={true} implementation="css">
                         <Drawer
                             variant="permanent"
-                            open
+                            open={true}
                             classes={{
                                 paper: classes.drawerPaper,
                             }}
@@ -156,9 +163,10 @@ class Layout extends Component {
             </Fragment>
         )
     }
+
+    private handleDrawerToggle = () => {
+        this.setState({mobileOpen: !this.state.mobileOpen});
+    };
 }
 
-export default compose(
-    withRouter,
-    withStyles(styles)
-)(Layout)
+export default withRouter(Layout)
