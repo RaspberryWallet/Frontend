@@ -20,10 +20,13 @@ const theme = createMuiTheme({
 
 
 interface IAppState {
-    modules: Module[];
+    modules: Module[] | null;
 }
 
 class App extends React.Component<{}, IAppState> {
+    public state = {
+        modules: null
+    };
 
     public componentDidMount() {
         this.fetchModules();
@@ -31,12 +34,13 @@ class App extends React.Component<{}, IAppState> {
 
 
     public render() {
+        const {modules} = this.state;
+
         return (
             <BrowserRouter>
                 <MuiThemeProvider theme={theme}>
 
-                    <Layout
-                        modules={this.state.modules}>
+                    <Layout modules={modules}>
 
                         <Switch>
                             <Route exact={true} path="/" render={this.renderRootPath}/>

@@ -1,11 +1,10 @@
-import {Button, WithStyles, withStyles} from "@material-ui/core";
+import {Button, Typography, WithStyles, withStyles} from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog/Dialog";
 import DialogActions from "@material-ui/core/DialogActions/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
-import TextField from "@material-ui/core/TextField/TextField";
-import {ChangeEvent, Component, Fragment} from "react";
+import {Component, Fragment} from "react";
 import * as React from "react";
 import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
@@ -45,20 +44,12 @@ class UnlockDialog extends Component<IRestoreDialogProps, {}> {
                 <DialogTitle id="form-dialog-title">Init/Restore</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Enter 12 mnemonic words to restore your wallet
+                        Unlock your security modules
                     </DialogContentText>
-                    <TextField
-                        onChange={this.onMnemonicWordsChange}
-                        multiline={true}
-                        autoFocus={true}
-                        margin="dense"
-                        id="name"
-                        label="12 Mnemonic words"
-                        fullWidth={true}
-                    />
+
                     {modules && modules.map(module => {
                         return <Fragment key={module.id}>
-                            <TextField label={module.name}/>
+                            <Typography variant="headline" component="h3">{module.name}</Typography>
                             <form>
                                 <div ref={element => this.moduleInputs[module.id] = element}
                                      dangerouslySetInnerHTML={{__html: module.htmlUi}}/>
@@ -78,12 +69,6 @@ class UnlockDialog extends Component<IRestoreDialogProps, {}> {
         )
     }
 
-    private onMnemonicWordsChange =
-        (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-            const mnemonicWords = event.target.value;
-            this.setState({mnemonicWords})
-        };
-
     private onRestoreClick = () => {
         this.sendRestore();
         this.props.onClose();
@@ -92,22 +77,22 @@ class UnlockDialog extends Component<IRestoreDialogProps, {}> {
     private async sendRestore() {
         console.log(`sending restore`);
 
-        const moduleToInputsMap : {[moduleId : string] : any} = {};
+        const moduleToInputsMap: { [moduleId: string]: any } = {};
 
         this.props.modules.forEach((module: Module) => {
             const inputs = {};
             const theModuleInputs = this.moduleInputs[module.id];
             if (theModuleInputs) {
                 theModuleInputs.childNodes
-                    .forEach((node: ChildNode) => inputs[node.nodeName] = node.nodeValue);
+                    .forEach((node: any) => inputs[node.name] = node.value);
             }
 
-            moduleToInputsMap.set(module.id, inputs);
+            moduleToInputsMap[module.id] = inputs;
         });
 
         console.log(JSON.stringify({moduleToInputsMap}));
         const response = await fetch(`${serverUrl}/api/unlockWallet`, {
-            body: JSON.stringify({moduleToInputsMap}),
+            body: JSON.stringify(moduleToInputsMap),
             headers: {
                 "Content-Type": "application/json; charset=utf-8",
             },

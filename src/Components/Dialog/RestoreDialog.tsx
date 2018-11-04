@@ -148,7 +148,7 @@ class RestoreDialog extends Component<IRestoreDialogProps, IRestoreDialogState> 
             const theModuleInputs = this.moduleInputs[moduleId];
             if (theModuleInputs) {
                 theModuleInputs.childNodes
-                    .forEach((node: ChildNode) => inputs[node.nodeName] = node.nodeValue);
+                    .forEach((node: any) => inputs[node.name] = node.value);
             }
 
             if (isSelected) {

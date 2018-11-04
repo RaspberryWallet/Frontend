@@ -18,7 +18,6 @@ export default class extends Component<Module, IModuleState> {
     public componentDidMount() {
         console.log("componentDidMount");
         this.fetchModuleState();
-        this.fetchModuleUi();
     }
 
     public render() {
@@ -47,14 +46,5 @@ export default class extends Component<Module, IModuleState> {
         const response = await fetch(`${serverUrl}/api/moduleState/${this.props.id}`);
         const moduleState = await response.json();
         this.setState({moduleState});
-    }
-
-    private async fetchModuleUi() {
-        console.log("fetchModuleUi");
-        const response = await fetch(`${serverUrl}/api/moduleHtmlUi/${this.props.id}`);
-        console.log(response);
-        const htmlUi = await response.text();
-        console.log(htmlUi);
-        this.setState({htmlUi});
     }
 }

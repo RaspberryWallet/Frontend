@@ -19,58 +19,53 @@ import {compose} from 'recompose'
 import Module from "../../Models/Module";
 
 const drawerWidth = 240;
-const styles = ({zIndex, breakpoints, spacing, palette, mixins}: Theme) => createStyles({
+const styles = (theme) => ({
     appBar: {
-        zIndex: zIndex.drawer + 1,
         position: 'fixed',
+        zIndex: theme.zIndex.drawer + 1,
     },
-    root: {
+    content: {
+        backgroundColor: theme.palette.background.default,
         flexGrow: 1,
-        zIndex: 1,
-        overflow: 'hidden',
-        position: 'relative',
-        display: 'flex',
-        width: '100%',
+        padding: theme.spacing.unit * 3,
     },
-    navIconHide: {
-        [breakpoints.up('md')]: {
-            display: 'none',
-        },
-    },
-    toolbar: mixins.toolbar,
     drawerPaper: {
         width: drawerWidth,
-        [breakpoints.up('md')]: {
+        [theme.breakpoints.up('md')]: {
             position: 'relative',
         },
     },
-    content: {
-        flexGrow: 1,
-        backgroundColor: palette.background.default,
-        padding: spacing.unit * 3,
+    navIconHide: {
+        [theme.breakpoints.up('md')]: {
+            display: 'none',
+        },
     },
     nested: {
-        paddingLeft: spacing.unit * 4,
+        paddingLeft: theme.spacing.unit * 4,
     },
+    root: {
+        display: 'flex',
+        flexGrow: 1,
+        overflow: 'hidden',
+        position: 'relative',
+        width: '100%',
+        zIndex: 1,
+    },
+
+    toolbar: theme.mixins.toolbar,
+
+
+
 });
 
-interface ILayoutProps extends WithStyles<typeof styles> {
-    location: any;
-    children: any;
-    modules: Module[];
-}
 
-interface ILayoutState {
-    mobileOpen: boolean;
-}
+class Layout extends Component {
 
-class Layout extends Component<ILayoutProps, ILayoutState> {
-
-    public state: ILayoutState = {
+    state = {
         mobileOpen: false,
     };
 
-    public render() {
+    render() {
         const {classes, location: {pathname}, children, modules} = this.props;
 
         const drawer = (
@@ -164,9 +159,9 @@ class Layout extends Component<ILayoutProps, ILayoutState> {
         )
     }
 
-    private handleDrawerToggle = () => {
+    handleDrawerToggle = () => {
         this.setState({mobileOpen: !this.state.mobileOpen});
     };
 }
 
-export default withRouter(Layout)
+export default compose(withRouter, withStyles(styles))(Layout)

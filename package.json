@@ -11,14 +11,13 @@
   "dependencies": {
     "@material-ui/core": "^3.3.2",
     "@material-ui/icons": "^3.0.1",
-
     "axios": "^0.18.0",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "react-router-dom": "^4.3.1",
     "react-scripts-ts": "3.1.0",
     "react-toastify": "^4.0.2",
-    "recompose": "latest",
+    "recompose": "^0.30.0",
     "url-parse": "^1.4.3",
     "websocket": "^1.0.28"
   },
@@ -30,6 +29,12 @@
     "@types/react-dom": "^16.0.9",
     "@types/react-router-dom": "^4.3.1",
     "@types/recompose": "^0.27.0",
+    "eslint": "^5.8.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
     "typescript": "^3.1.6"
   },
   "proxy": "http://localhost:9090"

@@ -21,7 +21,7 @@ const styles = {
     },
 };
 
-interface IModulesProps extends WithStyles<typeof styles>{
+interface IModulesProps extends WithStyles<typeof styles> {
     classes: any;
     modules: Module[]
     match: any;
@@ -111,9 +111,7 @@ class Modules extends Component<IModulesProps, IModulesState> {
 
                         <CardActions>
                             <Button size="small" color="secondary">Details</Button>
-                            <Button size="small" onClick={() => {
-                                this.fetchModuleState(module.id)
-                            }}>Refresh</Button>
+                            <Button size="small" onClick={this.fetchModuleState(module.id)}>Refresh</Button>
                         </CardActions>
                     </Card>
                 }
@@ -152,7 +150,7 @@ class Modules extends Component<IModulesProps, IModulesState> {
         this.submitModuleInput(module.id, inputs)
     }
 
-    private async fetchModuleState(id: string) {
+    private fetchModuleState = (id: string) => async () => {
         const response = await fetch(`${serverUrl}/api/moduleState/${id}`);
         const moduleState = await response.json();
         this.setState(state => state.moduleStates[id] = moduleState);
