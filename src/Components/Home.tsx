@@ -2,6 +2,7 @@ import {Button, Typography, WithStyles} from "@material-ui/core";
 import {withStyles} from '@material-ui/core/styles';
 import * as React from 'react'
 import {Component, Fragment} from "react";
+import {toast} from 'react-toastify';
 import {serverUrl} from '../config'
 import Module from "../Models/Module";
 import RestoreDialog from './Dialog/RestoreDialog'
@@ -130,38 +131,54 @@ class App extends Component<IAppProps, IAppState> {
     private fetchCurrentAddress = async () => {
         console.log(`fetching current address`);
         const response = await fetch(serverUrl + '/api/currentAddress');
-        let currentAddress = await response.json();
-        currentAddress = currentAddress.currentAddress;
-        console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
-        this.setState({currentAddress})
-    }
+        if (response.ok) {
+            let currentAddress = await response.json();
+            currentAddress = currentAddress.currentAddress;
+            console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
+            this.setState({currentAddress})
+        } else {
+            this.handleError(response)
+        }
+    };
 
     private fetchFreshAddress = async () => {
         console.log(`fetching fresh address`);
         const response = await fetch(serverUrl + '/api/freshAddress');
-        let currentAddress = await response.json();
-        currentAddress = currentAddress.freshAddress;
-        console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
-        this.setState({currentAddress})
+        if (response.ok) {
+            let currentAddress = await response.json();
+            currentAddress = currentAddress.freshAddress;
+            console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
+            this.setState({currentAddress})
+        } else {
+            this.handleError(response)
+        }
     };
 
 
     private fetchEstimatedBalance = async () => {
         console.log(`fetching estimated balance`);
         const response = await fetch(serverUrl + '/api/estimatedBalance');
-        let estimatedBalance = await response.json();
-        estimatedBalance = estimatedBalance.estimatedBalance;
-        console.log(`estimatedBalance ${JSON.stringify(estimatedBalance)}`);
-        this.setState({estimatedBalance})
+        if (response.ok) {
+            let estimatedBalance = await response.json();
+            estimatedBalance = estimatedBalance.estimatedBalance;
+            console.log(`estimatedBalance ${JSON.stringify(estimatedBalance)}`);
+            this.setState({estimatedBalance})
+        } else {
+            this.handleError(response)
+        }
     };
 
     private fetchAvailableBalance = async () => {
         console.log(`fetching available balance`);
         const response = await fetch(serverUrl + '/api/availableBalance');
-        let availableBalance = await response.json();
-        availableBalance = availableBalance.availableBalance;
-        console.log(`available balance ${JSON.stringify(availableBalance)}`);
-        this.setState({availableBalance})
+        if (response.ok) {
+            let availableBalance = await response.json();
+            availableBalance = availableBalance.availableBalance;
+            console.log(`available balance ${JSON.stringify(availableBalance)}`);
+            this.setState({availableBalance})
+        } else {
+            this.handleError(response)
+        }
     };
 
     private fetchCpuTemp = async () => {
@@ -174,22 +191,39 @@ class App extends Component<IAppProps, IAppState> {
     };
 
 
-
     private lockWallet = async () => {
         console.log(`fetching lockWallet`);
         const response = await fetch(serverUrl + '/api/lockWallet');
-        const responseText = await response.text();
-        console.log(`lockWallet ${responseText}`);
+        if (response.ok) {
+            const responseText = await response.text();
+            console.log(`lockWallet ${responseText}`);
+        } else {
+            this.handleError(response)
+        }
     };
 
     private walletStatus = async () => {
         console.log(`fetching walletStatus`);
         const response = await fetch(serverUrl + '/api/walletStatus');
-        let walletStatus = await response.json();
-        walletStatus = walletStatus.walletStatus;
-        console.log(`walletStatus ${JSON.stringify(walletStatus)}`);
-        this.setState({walletStatus})
+        if (response.ok) {
+            let walletStatus = await response.json();
+            walletStatus = walletStatus.walletStatus;
+            console.log(`walletStatus ${JSON.stringify(walletStatus)}`);
+            this.setState({walletStatus})
+        } else {
+            this.handleError(response)
+        }
     };
+
+    private async handleError(response: Response) {
+        console.dir(response);
+        if (response.body) {
+            const error = await response.json();
+            toast.error(error.message);
+        } else {
+            toast.error(response.statusText);
+        }
+    }
 
     private refreshBalances = () => {
         this.fetchEstimatedBalance();

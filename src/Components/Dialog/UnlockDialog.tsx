@@ -6,6 +6,7 @@ import DialogContentText from "@material-ui/core/DialogContentText/DialogContent
 import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
 import {Component, Fragment} from "react";
 import * as React from "react";
+import {toast} from "react-toastify";
 import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
 
@@ -101,7 +102,17 @@ class UnlockDialog extends Component<IRestoreDialogProps, {}> {
         if (response.ok) {
             console.log(`sending restore`);
         } else {
-            console.error("Failed");
+            this.handleError(response);
+        }
+    }
+
+    private async handleError(response: Response) {
+        console.dir(response);
+        if (response.body) {
+            const error = await response.json();
+            toast.error(error.message);
+        } else {
+            toast.error(response.statusText);
         }
     }
 }

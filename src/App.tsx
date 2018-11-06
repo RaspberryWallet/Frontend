@@ -3,6 +3,8 @@ import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
 import * as React from 'react';
 // @ts-ignore
 import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
+import {ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import NotFound from './Components/Errors/NotFound'
 import Home from './Components/Home'
 import Layout from './Components/Layout/index'
@@ -37,20 +39,23 @@ class App extends React.Component<{}, IAppState> {
         const {modules} = this.state;
 
         return (
-            <BrowserRouter>
-                <MuiThemeProvider theme={theme}>
+            <div>
+                <ToastContainer/>
+                <BrowserRouter>
+                    <MuiThemeProvider theme={theme}>
 
-                    <Layout modules={modules}>
+                        <Layout modules={modules}>
 
-                        <Switch>
-                            <Route exact={true} path="/" render={this.renderRootPath}/>
-                            <Route path="/modules" render={this.renderModulesPath}/>
-                            <Route component={NotFound}/>
-                        </Switch>
+                            <Switch>
+                                <Route exact={true} path="/" render={this.renderRootPath}/>
+                                <Route path="/modules" render={this.renderModulesPath}/>
+                                <Route component={NotFound}/>
+                            </Switch>
 
-                    </Layout>
-                </MuiThemeProvider>
-            </BrowserRouter>
+                        </Layout>
+                    </MuiThemeProvider>
+                </BrowserRouter>
+            </div>
         );
     }
 
