@@ -2,12 +2,12 @@ import {Button, Typography, WithStyles} from "@material-ui/core";
 import {withStyles} from '@material-ui/core/styles';
 import * as React from 'react'
 import {Component, Fragment} from "react";
-import {toast} from 'react-toastify';
 import {serverUrl} from '../config'
 import Module from "../Models/Module";
 import RestoreDialog from './Dialog/RestoreDialog'
 import SendCoinsDialog from './Dialog/SendCoinsDialog'
 import UnlockDialog from "./Dialog/UnlockDialog";
+import handleError from "./Errors/HandleError";
 
 const styles = {
     bullet: {
@@ -32,13 +32,13 @@ interface IAppState {
     cpuTemp: string | null;
     availableBalance: string | null;
     estimatedBalance: string | null;
-    walletStatus: "UNSET" | "ENCRYPTED" | "DECRYPTED";
+    walletStatus: "FIRST_TIME" | "UNLOADED" | "ENCRYPTED" | "DECRYPTED";
     openRestoreDialog: boolean;
     openSendDialog: boolean;
     openUnlockDialog: boolean;
 }
 
-class App extends Component<IAppProps, IAppState> {
+class Home extends Component<IAppProps, IAppState> {
 
     public state: IAppState = {
         availableBalance: null,
@@ -48,13 +48,14 @@ class App extends Component<IAppProps, IAppState> {
         openRestoreDialog: false,
         openSendDialog: false,
         openUnlockDialog: false,
-        walletStatus: "UNSET",
+        walletStatus: "FIRST_TIME",
     };
+
 
     public componentDidMount() {
         this.fetchPing();
         this.walletStatus();
-        if (this.state.walletStatus !== "UNSET") {
+        if (this.isLoaded()) {
             this.fetchCurrentAddress();
             this.fetchEstimatedBalance();
             this.fetchAvailableBalance();
@@ -82,16 +83,15 @@ class App extends Component<IAppProps, IAppState> {
                     {`Receive Address: ${currentAddress}`}
                 </Typography>
 
-                {walletStatus !== "UNSET" &&
-                <Button size="small" onClick={this.fetchFreshAddress}>Refresh Address</Button>}
+
+                <Button size="small" onClick={this.fetchFreshAddress}>Refresh Address</Button>
 
                 <Typography variant="headline" component="h2">
                     {`Balance: ${availableBalance}(${estimatedBalance})`}
                 </Typography>
 
-                {walletStatus !== "UNSET" &&
                 <Button size="small" onClick={this.refreshBalances}>Refresh Balances</Button>
-                }
+
 
                 <Button size="small" onClick={this.unlockWallet}>Unlock Wallet</Button>
                 <Button size="small" onClick={this.lockWallet}>Lock Wallet</Button>
@@ -109,16 +109,26 @@ class App extends Component<IAppProps, IAppState> {
                     onClose={this.handleCloseUnlockDialog}
                     modules={modules}
                     aria-labelledby="form-dialog-title"/>
-
-                {walletStatus !== "UNSET" &&
                 <SendCoinsDialog
                     open={this.state.openSendDialog}
                     onClose={this.handleCloseSendDialog}
                 />
-                }
+
 
             </Fragment>
         )
+    }
+
+    private isDecrypted() {
+        return this.state.walletStatus === "DECRYPTED";
+    }
+
+    private isEncrypted() {
+        return this.state.walletStatus === "ENCRYPTED";
+    }
+
+    private isLoaded() {
+        return this.isDecrypted() || this.isEncrypted();
     }
 
     private fetchPing = async () => {
@@ -137,7 +147,7 @@ class App extends Component<IAppProps, IAppState> {
             console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
             this.setState({currentAddress})
         } else {
-            this.handleError(response)
+            handleError(response)
         }
     };
 
@@ -150,7 +160,7 @@ class App extends Component<IAppProps, IAppState> {
             console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
             this.setState({currentAddress})
         } else {
-            this.handleError(response)
+            handleError(response)
         }
     };
 
@@ -164,7 +174,7 @@ class App extends Component<IAppProps, IAppState> {
             console.log(`estimatedBalance ${JSON.stringify(estimatedBalance)}`);
             this.setState({estimatedBalance})
         } else {
-            this.handleError(response)
+            handleError(response)
         }
     };
 
@@ -177,7 +187,7 @@ class App extends Component<IAppProps, IAppState> {
             console.log(`available balance ${JSON.stringify(availableBalance)}`);
             this.setState({availableBalance})
         } else {
-            this.handleError(response)
+            handleError(response)
         }
     };
 
@@ -198,7 +208,7 @@ class App extends Component<IAppProps, IAppState> {
             const responseText = await response.text();
             console.log(`lockWallet ${responseText}`);
         } else {
-            this.handleError(response)
+            handleError(response)
         }
     };
 
@@ -211,19 +221,9 @@ class App extends Component<IAppProps, IAppState> {
             console.log(`walletStatus ${JSON.stringify(walletStatus)}`);
             this.setState({walletStatus})
         } else {
-            this.handleError(response)
+            handleError(response)
         }
     };
-
-    private async handleError(response: Response) {
-        console.dir(response);
-        if (response.body) {
-            const error = await response.json();
-            toast.error(error.message);
-        } else {
-            toast.error(response.statusText);
-        }
-    }
 
     private refreshBalances = () => {
         this.fetchEstimatedBalance();
@@ -256,4 +256,4 @@ class App extends Component<IAppProps, IAppState> {
 
 }
 
-export default withStyles(styles)(App)
+export default withStyles(styles)(Home)

@@ -2,11 +2,12 @@ import {indigo, yellow} from '@material-ui/core/colors';
 import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
 import * as React from 'react';
 // @ts-ignore
-import {BrowserRouter, Link, Route, Switch} from 'react-router-dom'
+import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NotFound from './Components/Errors/NotFound'
 import Home from './Components/Home'
+import Initialization from "./Components/Initialization/Initialization";
 import Layout from './Components/Layout/index'
 import Modules from './Components/Modules/index'
 import {serverUrl} from './config'
@@ -26,14 +27,13 @@ interface IAppState {
 }
 
 class App extends React.Component<{}, IAppState> {
-    public state = {
-        modules: null
+    public state: IAppState = {
+        modules: null,
     };
 
     public componentDidMount() {
         this.fetchModules();
     }
-
 
     public render() {
         const {modules} = this.state;
@@ -41,13 +41,16 @@ class App extends React.Component<{}, IAppState> {
         return (
             <div>
                 <ToastContainer/>
+
+                {modules &&
                 <BrowserRouter>
                     <MuiThemeProvider theme={theme}>
 
                         <Layout modules={modules}>
 
                             <Switch>
-                                <Route exact={true} path="/" render={this.renderRootPath}/>
+                                <Route exact={true} path="/" render={this.renderInitPath}/>
+                                <Route exact={true} path="/home" render={this.renderHomePath}/>
                                 <Route path="/modules" render={this.renderModulesPath}/>
                                 <Route component={NotFound}/>
                             </Switch>
@@ -55,17 +58,25 @@ class App extends React.Component<{}, IAppState> {
                         </Layout>
                     </MuiThemeProvider>
                 </BrowserRouter>
+                }
+
+                {!modules && <a>Loading...</a>}
             </div>
         );
     }
 
-    private renderRootPath = (props: any) => {
+    private renderInitPath = (props: any) => {
+        return <Initialization {...props} modules={this.state.modules}/>;
+    };
+
+    private renderHomePath = (props: any) => {
         return <Home {...props} modules={this.state.modules}/>;
     };
 
     private renderModulesPath = (props: any) => {
         return <Modules {...props} modules={this.state.modules}/>;
     };
+
 
     private async fetchModules() {
         console.log(`fetching modules`);
