@@ -1,23 +1,25 @@
-import {indigo, yellow} from '@material-ui/core/colors';
+import {orange, pink} from "@material-ui/core/es/colors";
 import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
 import * as React from 'react';
 // @ts-ignore
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './App.css';
+import handleError from "./Components/Errors/HandleError";
 import NotFound from './Components/Errors/NotFound'
 import Home from './Components/Home'
 import Initialization from "./Components/Initialization/Initialization";
 import Layout from './Components/Layout/index'
 import Modules from './Components/Modules/index'
 import {serverUrl} from './config'
+import logo from './logo.png'
 import Module from './Models/Module'
 
 const theme = createMuiTheme({
     palette: {
-        primary: indigo,
-        secondary: yellow,
-        type: 'dark',
+        primary: orange,
+        secondary: pink,
     }
 });
 
@@ -60,7 +62,14 @@ class App extends React.Component<{}, IAppState> {
                 </BrowserRouter>
                 }
 
-                {!modules && <a>Loading...</a>}
+                {!modules &&
+                <div className="App">
+                    <header className="App-header">
+                        <img src={logo} className="App-logo" alt="logo"/>
+                        <h1 className="App-title">Loading...</h1>
+                    </header>
+                </div>
+                }
             </div>
         );
     }
@@ -81,8 +90,12 @@ class App extends React.Component<{}, IAppState> {
     private async fetchModules() {
         console.log(`fetching modules`);
         const response = await fetch(serverUrl + '/api/modules');
-        const modules = await response.json();
-        this.setState({modules});
+        if (response.ok) {
+            const modules = await response.json();
+            this.setState({modules});
+        } else {
+            handleError(response)
+        }
     }
 }
 

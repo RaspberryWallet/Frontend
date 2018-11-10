@@ -2,7 +2,7 @@ import {Button, Card, CardActions, CardContent, Typography, WithStyles, withStyl
 import * as React from 'react'
 import {Component, Fragment} from 'react'
 // @ts-ignore
-import {Link, Redirect, Route, Switch} from "react-router-dom";
+import {Redirect, Route, Switch} from "react-router-dom";
 import {serverUrl} from "../../config";
 import Module from '../../Models/Module'
 import ModuleView from './ModuleView/index'
@@ -148,13 +148,13 @@ class Modules extends Component<IModulesProps, IModulesState> {
                 .forEach((node: ChildNode) => inputs[node.nodeName] = node.nodeValue);
         }
         this.submitModuleInput(module.id, inputs)
-    }
+    };
 
     private fetchModuleState = (id: string) => async () => {
         const response = await fetch(`${serverUrl}/api/moduleState/${id}`);
         const moduleState = await response.json();
         this.setState(state => state.moduleStates[id] = moduleState);
-    }
+    };
 
     private async submitModuleInput(id: string, inputs: any) {
         console.log(`id: ${id} inputs: ${JSON.stringify(inputs)}`);

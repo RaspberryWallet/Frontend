@@ -6,7 +6,9 @@ import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
 import TextField from "@material-ui/core/TextField/TextField";
 import {ChangeEvent, Component} from "react";
 import * as React from "react";
+import {toast} from "react-toastify";
 import {serverUrl} from "../../config";
+import handleError from "../Errors/HandleError";
 
 const styles = {
     bullet: {
@@ -91,7 +93,6 @@ class SendCoinsDialog extends Component<ISendCoinsDialogProps, ISendCoinsDialogS
     };
     private onSendClick = () => {
         this.sendCoins();
-        this.props.onClose();
     };
 
     private sendCoins = async () => {
@@ -105,7 +106,12 @@ class SendCoinsDialog extends Component<ISendCoinsDialogProps, ISendCoinsDialogS
             },
             method: 'POST',
         });
-        console.log(response);
+        if (response.ok) {
+            toast.success("Successfully sent coins !")
+        } else {
+            handleError(response)
+        }
+        this.props.onClose();
     };
 
 }

@@ -3,6 +3,7 @@ import LinearProgress from "@material-ui/core/es/LinearProgress/LinearProgress";
 import {withStyles} from '@material-ui/core/styles';
 import * as React from 'react'
 import {Component, Fragment} from "react";
+import {toast} from "react-toastify";
 import {serverUrl} from '../config'
 import Module from "../Models/Module";
 import RestoreDialog from './Dialog/RestoreDialog'
@@ -218,6 +219,7 @@ class Home extends Component<IAppProps, IAppState> {
         if (response.ok) {
             const responseText = await response.text();
             console.log(`lockWallet ${responseText}`);
+            toast.success("Successfully locked wallet")
         } else {
             handleError(response)
         }

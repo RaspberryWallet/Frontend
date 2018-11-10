@@ -9,6 +9,7 @@ import * as React from "react";
 import {toast} from "react-toastify";
 import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
+import handleError from "../Errors/HandleError";
 
 const styles = {
     bullet: {
@@ -100,21 +101,13 @@ class UnlockDialog extends Component<IRestoreDialogProps, {}> {
             method: 'POST',
         });
         if (response.ok) {
+            toast.success("Successfully unlocked wallet");
             console.log(`sending restore`);
         } else {
-            this.handleError(response);
+            handleError(response);
         }
     }
 
-    private async handleError(response: Response) {
-        console.dir(response);
-        if (response.body) {
-            const error = await response.json();
-            toast.error(error.message);
-        } else {
-            toast.error(response.statusText);
-        }
-    }
 }
 
 export default withStyles(styles)(UnlockDialog)

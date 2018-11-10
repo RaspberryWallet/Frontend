@@ -10,13 +10,12 @@ import {
     Typography, WithStyles
 } from '@material-ui/core'
 import {withStyles} from '@material-ui/core/styles';
-import createStyles from "@material-ui/core/styles/createStyles";
 import {Menu} from '@material-ui/icons'
 import * as React from 'react'
 import {Component, Fragment} from 'react'
 import {Link, withRouter} from 'react-router-dom'
 import {compose} from 'recompose'
-import Module from "../../Models/Module";
+import logo from '../../logo.png'
 
 const drawerWidth = 240;
 const styles = (theme) => ({
@@ -34,6 +33,9 @@ const styles = (theme) => ({
         [theme.breakpoints.up('md')]: {
             position: 'relative',
         },
+    },
+    logo: {
+        height: 40,
     },
     navIconHide: {
         [theme.breakpoints.up('md')]: {
@@ -53,8 +55,6 @@ const styles = (theme) => ({
     },
 
     toolbar: theme.mixins.toolbar,
-
-
 
 });
 
@@ -118,6 +118,9 @@ class Layout extends Component {
                                 className={classes.navIconHide}
                             >
                                 <Menu/>
+                            </IconButton>
+                            <IconButton color="inherit">
+                                <img className={classes.logo} width="inherit" height="inherit" src={logo} alt="logo"/>
                             </IconButton>
                             <Typography variant="title" color="inherit" noWrap={true}>
                                 Raspberry Wallet

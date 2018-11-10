@@ -2,12 +2,13 @@ import {Button, Typography, WithStyles, withStyles} from "@material-ui/core";
 import Checkbox from "@material-ui/core/Checkbox/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel/FormControlLabel";
 import TextField from "@material-ui/core/TextField/TextField";
-import {ChangeEvent, Component, Fragment} from "react";
+import {ChangeEvent, Component} from "react";
 import * as React from "react";
 import {toast} from "react-toastify";
 import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
 import handleError from "../Errors/HandleError";
+import './RestoreFromSeed.css'
 
 const styles = {
     bullet: {
@@ -20,7 +21,7 @@ const styles = {
     },
     pos: {
         marginBottom: 12,
-    },
+    }
 };
 
 interface IRestoreFromSeedProps extends WithStyles<typeof styles> {
@@ -48,7 +49,7 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
     public render() {
         const {modules} = this.props;
         return (
-            <Fragment>
+            <div className="root">
                 <Typography variant="headline" component="h2">
                     Enter 12 mnemonic words to restore your wallet
                 </Typography>
@@ -62,7 +63,7 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
                     fullWidth={true}
                 />
                 {modules && modules.map(module => {
-                    return <Fragment key={module.id}>
+                    return <div key={module.id} className="module">
                         <FormControlLabel
                             control={
                                 <Checkbox
@@ -77,7 +78,7 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
                             <div ref={element => this.moduleInputs[module.id] = element}
                                  dangerouslySetInnerHTML={{__html: module.htmlUi}}/>
                         </form>
-                    </Fragment>
+                    </div>
                 })}
                 <TextField
                     id="standard-number"
@@ -94,7 +95,7 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
                 <Button onClick={this.onRestoreClick} color="primary">
                     Restore
                 </Button>
-            </Fragment>
+            </div>
         )
     }
 
@@ -117,7 +118,7 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
             });
         };
 
-    private onRestoreClick = async() => {
+    private onRestoreClick = async () => {
         console.log(`sending restore`);
 
         const {mnemonicWords, moduleSelectionState, required} = this.state;
