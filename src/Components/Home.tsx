@@ -1,4 +1,5 @@
 import {Button, Typography, WithStyles} from "@material-ui/core";
+import LinearProgress from "@material-ui/core/es/LinearProgress/LinearProgress";
 import {withStyles} from '@material-ui/core/styles';
 import * as React from 'react'
 import {Component, Fragment} from "react";
@@ -36,6 +37,7 @@ interface IAppState {
     openRestoreDialog: boolean;
     openSendDialog: boolean;
     openUnlockDialog: boolean;
+    syncProgress: number;
 }
 
 class Home extends Component<IAppProps, IAppState> {
@@ -49,6 +51,7 @@ class Home extends Component<IAppProps, IAppState> {
         openSendDialog: false,
         openUnlockDialog: false,
         walletStatus: "FIRST_TIME",
+        syncProgress: 100.0,
     };
 
 
@@ -60,7 +63,14 @@ class Home extends Component<IAppProps, IAppState> {
             this.fetchEstimatedBalance();
             this.fetchAvailableBalance();
         }
+        const socketBlockChainSync = new WebSocket('ws://localhost:9090/blockChainSyncProgress');
+        socketBlockChainSync.addEventListener('message', (event) => {
+            const progress = event.data;
+            console.log(`Sync progress ${progress}`);
+            this.setState({syncProgress: parseFloat(progress)});
+        });
     }
+
 
     public render() {
         console.log("render");
@@ -70,6 +80,7 @@ class Home extends Component<IAppProps, IAppState> {
 
         return (
             <Fragment>
+                <LinearProgress variant="determinate" value={this.state.syncProgress}/>
                 <Typography variant="headline" component="h2">
                     {`Status: ${walletStatus}`}
                 </Typography>
