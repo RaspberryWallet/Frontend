@@ -64,7 +64,7 @@ class Home extends Component<IAppProps, IAppState> {
             this.fetchEstimatedBalance();
             this.fetchAvailableBalance();
         }
-        const socketBlockChainSync = new WebSocket('ws://localhost:9090/blockChainSyncProgress');
+        const socketBlockChainSync = new WebSocket(`ws://${serverUrl}/blockChainSyncProgress`);
         socketBlockChainSync.addEventListener('message', (event) => {
             const progress = parseInt(event.data, 10);
             console.log(`Sync progress ${progress}`);
@@ -74,7 +74,7 @@ class Home extends Component<IAppProps, IAppState> {
             }
         });
 
-        const autoLockSocket = new WebSocket('ws://localhost:9090/autolock');
+        const autoLockSocket = new WebSocket(`ws://${serverUrl}/autolock`);
         autoLockSocket.addEventListener('message', (event) => {
             const value = event.data;
             if (value === "0") {

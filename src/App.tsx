@@ -32,9 +32,9 @@ class App extends React.Component<{}, IAppState> {
         modules: null,
     };
 
-    public successSocket = new WebSocket('ws://localhost:9090/success');
-    public errorSocket = new WebSocket('ws://localhost:9090/error');
-    public infoSocket = new WebSocket('ws://localhost:9090/info');
+    public successSocket = new WebSocket(`ws://${serverUrl}/success`);
+    public errorSocket = new WebSocket(`ws://${serverUrl}/error`);
+    public infoSocket = new WebSocket(`ws://${serverUrl}/info`);
 
     public componentDidMount() {
         this.fetchModules();
