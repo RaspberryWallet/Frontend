@@ -51,7 +51,7 @@ class Initialization extends Component<IInitProps, IInitState> {
     };
 
     public render() {
-        const {phase,walletStatus} = this.state;
+        const {phase, walletStatus} = this.state;
 
         if (this.state.toHome) {
             return <Redirect to='/home'/>
@@ -77,7 +77,7 @@ class Initialization extends Component<IInitProps, IInitState> {
                 {phase === "UNLOCK_OR_RESTORE" && walletStatus === "FIRST_TIME" &&
                 <RestoreFromSeed modules={this.props.modules} onSuccess={this.onSuccess}/>
                 }
-                {phase === "UNLOCK_OR_RESTORE" && walletStatus === "UNLOADED" &&
+                {phase === "UNLOCK_OR_RESTORE" && (walletStatus === "UNLOADED" || walletStatus === "ENCRYPTED") &&
                 <LoadWalletFromDisk modules={this.props.modules} onSuccess={this.onSuccess}/>
                 }
             </Fragment>

@@ -28,7 +28,8 @@ const styles = {
 interface IRestoreDialogProps extends WithStyles<typeof styles> {
     open: boolean;
     onClose: any;
-    modules: Module[]
+    modules: Module[];
+    walletStatus : () => Promise<any>;
 }
 
 class UnlockDialog extends Component<IRestoreDialogProps, {}> {
@@ -103,6 +104,7 @@ class UnlockDialog extends Component<IRestoreDialogProps, {}> {
         if (response.ok) {
             toast.success("Successfully unlocked wallet");
             console.log(`sending restore`);
+            this.props.walletStatus();
         } else {
             handleError(response);
         }

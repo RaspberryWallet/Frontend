@@ -52,7 +52,7 @@ class Home extends Component<IAppProps, IAppState> {
         openSendDialog: false,
         openUnlockDialog: false,
         walletStatus: "FIRST_TIME",
-        syncProgress: 100.0,
+        syncProgress: 100,
     };
 
 
@@ -66,9 +66,23 @@ class Home extends Component<IAppProps, IAppState> {
         }
         const socketBlockChainSync = new WebSocket('ws://localhost:9090/blockChainSyncProgress');
         socketBlockChainSync.addEventListener('message', (event) => {
-            const progress = event.data;
+            const progress = parseInt(event.data, 10);
             console.log(`Sync progress ${progress}`);
-            this.setState({syncProgress: parseFloat(progress)});
+            this.setState({syncProgress: progress});
+            if(progress === 100){
+                this.walletStatus()
+            }
+        });
+
+        const autoLockSocket = new WebSocket('ws://localhost:9090/autolock');
+        autoLockSocket.addEventListener('message', (event) => {
+            const value = event.data;
+            if (value === "0") {
+                toast.info(`Wallet locked`);
+                this.walletStatus()
+            } else {
+                toast.info(`Auto wallet will trigger in ${value}`)
+            }
         });
     }
 
@@ -104,7 +118,6 @@ class Home extends Component<IAppProps, IAppState> {
 
                 <Button size="small" onClick={this.refreshBalances}>Refresh Balances</Button>
 
-
                 <Button size="small" onClick={this.unlockWallet}>Unlock Wallet</Button>
                 <Button size="small" onClick={this.lockWallet}>Lock Wallet</Button>
                 <Button size="small" onClick={this.walletStatus}>Refresh Status</Button>
@@ -117,6 +130,7 @@ class Home extends Component<IAppProps, IAppState> {
                     modules={modules}
                     aria-labelledby="form-dialog-title"/>
                 <UnlockDialog
+                    walletStatus={this.walletStatus}
                     open={this.state.openUnlockDialog}
                     onClose={this.handleCloseUnlockDialog}
                     modules={modules}
@@ -220,6 +234,7 @@ class Home extends Component<IAppProps, IAppState> {
             const responseText = await response.text();
             console.log(`lockWallet ${responseText}`);
             toast.success("Successfully locked wallet")
+            this.walletStatus()
         } else {
             handleError(response)
         }
@@ -232,7 +247,9 @@ class Home extends Component<IAppProps, IAppState> {
             let walletStatus = await response.json();
             walletStatus = walletStatus.walletStatus;
             console.log(`walletStatus ${JSON.stringify(walletStatus)}`);
-            this.setState({walletStatus})
+            this.setState({walletStatus});
+            this.fetchCurrentAddress();
+            this.refreshBalances();
         } else {
             handleError(response)
         }

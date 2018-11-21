@@ -3,7 +3,7 @@ import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
 import * as React from 'react';
 // @ts-ignore
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
-import {ToastContainer} from 'react-toastify';
+import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import handleError from "./Components/Errors/HandleError";
@@ -23,7 +23,6 @@ const theme = createMuiTheme({
     }
 });
 
-
 interface IAppState {
     modules: Module[] | null;
 }
@@ -33,8 +32,32 @@ class App extends React.Component<{}, IAppState> {
         modules: null,
     };
 
+    public successSocket = new WebSocket('ws://localhost:9090/success');
+    public errorSocket = new WebSocket('ws://localhost:9090/error');
+    public infoSocket = new WebSocket('ws://localhost:9090/info');
+
     public componentDidMount() {
         this.fetchModules();
+        this.successSocket.addEventListener('message', (event) => {
+            toast.success(event.data)
+        });
+        this.infoSocket.addEventListener('message', (event) => {
+            toast.info(event.data)
+        });
+
+        this.errorSocket.addEventListener('message', (event) => {
+            toast.error(event.data)
+        });
+    }
+
+
+    public componentWillUnmount(): void {
+        // @ts-ignore
+        super.componentWillUnmount();
+        this.successSocket.close();
+        this.infoSocket.close();
+        this.errorSocket.close();
+
     }
 
     public render() {
