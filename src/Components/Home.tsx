@@ -39,6 +39,7 @@ interface IAppState {
     openSendDialog: boolean;
     openUnlockDialog: boolean;
     syncProgress: number;
+    autoLockRemaining: number;
 }
 
 class Home extends Component<IAppProps, IAppState> {
@@ -53,6 +54,7 @@ class Home extends Component<IAppProps, IAppState> {
         openUnlockDialog: false,
         walletStatus: "FIRST_TIME",
         syncProgress: 100,
+        autoLockRemaining: 300,
     };
 
 
@@ -64,24 +66,24 @@ class Home extends Component<IAppProps, IAppState> {
             this.fetchEstimatedBalance();
             this.fetchAvailableBalance();
         }
-        const socketBlockChainSync = new WebSocket(`ws://${serverUrl}/blockChainSyncProgress`);
+        const socketBlockChainSync = new WebSocket(`ws://localhost/blockChainSyncProgress`);
         socketBlockChainSync.addEventListener('message', (event) => {
             const progress = parseInt(event.data, 10);
             console.log(`Sync progress ${progress}`);
             this.setState({syncProgress: progress});
-            if(progress === 100){
+            if (progress === 100) {
                 this.walletStatus()
             }
         });
 
-        const autoLockSocket = new WebSocket(`ws://${serverUrl}/autolock`);
+        const autoLockSocket = new WebSocket(`ws://localhost/autolock`);
         autoLockSocket.addEventListener('message', (event) => {
             const value = event.data;
             if (value === "0") {
                 toast.info(`Wallet locked`);
                 this.walletStatus()
             } else {
-                toast.info(`Auto wallet will trigger in ${value}`)
+                this.setState({autoLockRemaining: parseInt(value, 10)});
             }
         });
     }
@@ -95,6 +97,14 @@ class Home extends Component<IAppProps, IAppState> {
 
         return (
             <Fragment>
+                <Typography variant="headline" component="h4">
+                    {`AutoLock Remaining`}
+                </Typography>
+                <LinearProgress variant="determinate"
+                                value={this.normaliseAutoLockProgress(this.state.autoLockRemaining)}/>
+                <Typography variant="headline" component="h4">
+                    {`Synchronization`}
+                </Typography>
                 <LinearProgress variant="determinate" value={this.state.syncProgress}/>
                 <Typography variant="headline" component="h2">
                     {`Status: ${walletStatus}`}
@@ -144,6 +154,8 @@ class Home extends Component<IAppProps, IAppState> {
             </Fragment>
         )
     }
+
+    private normaliseAutoLockProgress = (value: number) => value * 100 / 300;
 
     private isDecrypted() {
         return this.state.walletStatus === "DECRYPTED";

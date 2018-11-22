@@ -119,8 +119,6 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
         };
 
     private onRestoreClick = async () => {
-        console.log(`sending restore`);
-
         const {mnemonicWords, moduleSelectionState, required} = this.state;
         const modules = {};
 

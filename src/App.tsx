@@ -20,6 +20,9 @@ const theme = createMuiTheme({
     palette: {
         primary: orange,
         secondary: pink,
+    },
+    typography: {
+        useNextVariants: true,
     }
 });
 
@@ -32,9 +35,9 @@ class App extends React.Component<{}, IAppState> {
         modules: null,
     };
 
-    public successSocket = new WebSocket(`ws://${serverUrl}/success`);
-    public errorSocket = new WebSocket(`ws://${serverUrl}/error`);
-    public infoSocket = new WebSocket(`ws://${serverUrl}/info`);
+    public successSocket = new WebSocket(`ws://localhost/success`);
+    public errorSocket = new WebSocket(`ws://localhost/error`);
+    public infoSocket = new WebSocket(`ws://localhost/info`);
 
     public componentDidMount() {
         this.fetchModules();

@@ -1,7 +1,6 @@
 import {Button, Typography, WithStyles, withStyles} from "@material-ui/core";
 import {Component} from "react";
 import * as React from "react";
-import {toast} from "react-toastify";
 import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
 import handleError from "../Errors/HandleError";
@@ -59,8 +58,6 @@ class LoadWalletFromDisk extends Component<IRestoreDialogProps, {}> {
     }
 
     private onUnlockClick = async () => {
-        console.log(`sending restore`);
-
         const moduleToInputsMap: { [moduleId: string]: any } = {};
 
         this.props.modules.forEach((module: Module) => {
@@ -83,7 +80,6 @@ class LoadWalletFromDisk extends Component<IRestoreDialogProps, {}> {
             method: 'POST',
         });
         if (response.ok) {
-            toast.success(`sending restore`);
             this.props.onSuccess()
         } else {
             handleError(response);
