@@ -7,14 +7,20 @@ This module is resposible for forntend of Raspberry Wallet. It doesn't contain a
 ![Demo](https://i.imgur.com/dS7OEjs.gif)
 
 ## Requirements
-- //TODO
+- `npm` or `yarn`
 
 ## Installation
 ```bash
 # get repo
 git clone https://github.com/RaspberryWallet/Frontend.git
 cd Frontend
-//TODO
+
+# will start app in development mode
+yarn start
+
+# or you can build production ready app
+yarn build 
+
 ```
 
 ## Table of contents
@@ -28,7 +34,12 @@ cd Frontend
 - [Changelog](#changelog)
 
 ## Details
-//TODO
+Simple UI to work with [Backend](https://github.com/RaspberryWallet/Backend), so make sure it's running before launching webapp. 
+This app uses [create-react-app-typescript](https://github.com/wmonk/create-react-app-typescript) to automate whole process of development. 
+Frontend <-> Backend communication is made using two techniques:
+* Standart operations uses HTTP calls to RESTful Server
+* Websockets for bidirectional communication like sending alerts, errors and subscribing to listeners
+
 
 ## Authors
 
