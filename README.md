@@ -15,9 +15,11 @@ This module is resposible for forntend of Raspberry Wallet. It doesn't contain a
 git clone https://github.com/RaspberryWallet/Frontend.git
 cd Frontend
 
-yarn start // will start app in development mode
+# will start app in development mode
+yarn start
 
-yarn build // will build production ready app 
+# or you can build production ready app
+yarn build 
 
 ```
 
