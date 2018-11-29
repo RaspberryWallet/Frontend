@@ -10,6 +10,7 @@ import RestoreDialog from './Dialog/RestoreDialog'
 import SendCoinsDialog from './Dialog/SendCoinsDialog'
 import UnlockDialog from "./Dialog/UnlockDialog";
 import handleError from "./Errors/HandleError";
+import History from "./History";
 
 const styles = {
     bullet: {
@@ -40,6 +41,7 @@ interface IAppState {
     openUnlockDialog: boolean;
     syncProgress: number;
     autoLockRemaining: number;
+    transactions: Transaction[];
 }
 
 class Home extends Component<IAppProps, IAppState> {
@@ -55,17 +57,13 @@ class Home extends Component<IAppProps, IAppState> {
         walletStatus: "FIRST_TIME",
         syncProgress: 100,
         autoLockRemaining: 300,
+        transactions : new Array<Transaction>(),
     };
 
 
     public componentDidMount() {
         this.fetchPing();
         this.walletStatus();
-        if (this.isLoaded()) {
-            this.fetchCurrentAddress();
-            this.fetchEstimatedBalance();
-            this.fetchAvailableBalance();
-        }
         const socketBlockChainSync = new WebSocket(`ws://localhost/blockChainSyncProgress`);
         socketBlockChainSync.addEventListener('message', (event) => {
             const progress = parseInt(event.data, 10);
@@ -149,6 +147,12 @@ class Home extends Component<IAppProps, IAppState> {
                     open={this.state.openSendDialog}
                     onClose={this.handleCloseSendDialog}
                 />
+                {this.state.transactions &&
+                <History transactions={this.state.transactions}/>
+                }
+                {!this.state.transactions &&
+                <Typography variant="headline" component="h2">{`No operations found`}</Typography>
+                }
 
 
             </Fragment>
@@ -156,18 +160,6 @@ class Home extends Component<IAppProps, IAppState> {
     }
 
     private normaliseAutoLockProgress = (value: number) => value * 100 / 300;
-
-    private isDecrypted() {
-        return this.state.walletStatus === "DECRYPTED";
-    }
-
-    private isEncrypted() {
-        return this.state.walletStatus === "ENCRYPTED";
-    }
-
-    private isLoaded() {
-        return this.isDecrypted() || this.isEncrypted();
-    }
 
     private fetchPing = async () => {
         console.log(`fetching pings`);
@@ -229,6 +221,19 @@ class Home extends Component<IAppProps, IAppState> {
         }
     };
 
+    private fetchTransactions = async () => {
+        console.log(`fetching transactions`);
+        const response = await fetch(serverUrl + '/api/allTransactions');
+        if (response.ok) {
+            let transactions = await response.json();
+            transactions = transactions.allTransactions;
+            console.log(`allTransactions ${JSON.stringify(transactions)}`);
+            this.setState({transactions})
+        } else {
+            handleError(response)
+        }
+    };
+
     private fetchCpuTemp = async () => {
         console.log(`fetching cpu temp`);
         const response = await fetch(serverUrl + '/api/cpuTemp');
@@ -262,6 +267,7 @@ class Home extends Component<IAppProps, IAppState> {
             this.setState({walletStatus});
             this.fetchCurrentAddress();
             this.refreshBalances();
+            this.fetchTransactions();
         } else {
             handleError(response)
         }
