@@ -16,6 +16,7 @@ import {serverUrl} from './config'
 import logo from './logo.png'
 import Module from './Models/Module'
 
+
 const theme = createMuiTheme({
     palette: {
         primary: orange,
@@ -25,6 +26,7 @@ const theme = createMuiTheme({
         useNextVariants: true,
     }
 });
+
 
 interface IAppState {
     modules: Module[] | null;

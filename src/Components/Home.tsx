@@ -10,7 +10,7 @@ import RestoreDialog from './Dialog/RestoreDialog'
 import SendCoinsDialog from './Dialog/SendCoinsDialog'
 import UnlockDialog from "./Dialog/UnlockDialog";
 import handleError from "./Errors/HandleError";
-import History from "./History";
+import History from "./History/History";
 
 const styles = {
     bullet: {
@@ -129,6 +129,7 @@ class Home extends Component<IAppProps, IAppState> {
                 <Button size="small" onClick={this.unlockWallet}>Unlock Wallet</Button>
                 <Button size="small" onClick={this.lockWallet}>Lock Wallet</Button>
                 <Button size="small" onClick={this.walletStatus}>Refresh Status</Button>
+                <Button size="small" onClick={this.fetchTransactions}>Refresh Transactions</Button>
                 <Button size="small" onClick={this.handleClickRestore}>Init/Restore</Button>
                 <Button size="small" onClick={this.handleClickSend}>Send</Button>
 

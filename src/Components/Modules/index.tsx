@@ -22,7 +22,6 @@ const styles = {
 };
 
 interface IModulesProps extends WithStyles<typeof styles> {
-    classes: any;
     modules: Module[]
     match: any;
 }
@@ -71,8 +70,7 @@ class Modules extends Component<IModulesProps, IModulesState> {
     }
 
     private renderExactPath = () => {
-        const modules: Module[] = this.props.modules;
-        const classes: any = this.props.classes;
+        const {modules, classes} = this.props;
 
         if (!modules) {
             return <h3>No modules found</h3>;

@@ -4,7 +4,8 @@
 
 This module is resposible for forntend of Raspberry Wallet. It doesn't contain a lot logic, most of it is TypeScript with React.
 
-![Demo](https://i.imgur.com/dS7OEjs.gif)
+![Image demo](https://i.imgur.com/KMj6FNa.png)
+![Demo GIF](https://i.imgur.com/dS7OEjs.gif)
 
 ## Requirements
 - `npm` or `yarn`
