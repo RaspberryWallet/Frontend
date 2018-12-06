@@ -43,5 +43,5 @@
     "eslint-plugin-standard": "^4.0.0",
     "typescript": "^3.1.6"
   },
-  "proxy": "http://localhost:80"
+  "proxy": "http://localhost:9080"
 }

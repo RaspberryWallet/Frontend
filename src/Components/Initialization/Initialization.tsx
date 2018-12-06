@@ -80,6 +80,9 @@ class Initialization extends Component<IInitProps, IInitState> {
                 {phase === "UNLOCK_OR_RESTORE" && (walletStatus === "UNLOADED" || walletStatus === "ENCRYPTED") &&
                 <LoadWalletFromDisk modules={this.props.modules} onSuccess={this.onSuccess}/>
                 }
+                {phase === "UNLOCK_OR_RESTORE" && (walletStatus === "DECRYPTED") &&
+                this.onSuccess()
+                }
             </Fragment>
         )
     }

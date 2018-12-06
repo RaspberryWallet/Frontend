@@ -49,7 +49,6 @@ Frontend <-> Backend communication is made using two techniques:
 | Name                                                 | email                     |
 |------------------------------------------------------|---------------------------|
 | [Stanisław Barański](https://github.com/stasbar)     | stasbar1995@gmail.com     |
-| [Piotr Pabis](https://github.com/pfoof)              | rotworm0@yahoo.pl         |
 
 ## Changelog
 
