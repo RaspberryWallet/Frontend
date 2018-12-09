@@ -130,7 +130,7 @@ class Modules extends Component<IModulesProps, IModulesState> {
         if (!foundModule) {
             return <h3>No module found for id {match.params.moduleId}</h3>;
         }
-        return <ModuleView {...foundModule}/>
+        return <ModuleView module={foundModule}/>
     };
 
     private renderRedirect = () => {

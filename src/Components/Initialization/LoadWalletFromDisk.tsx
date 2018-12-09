@@ -5,6 +5,7 @@ import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
 import handleError from "../Errors/HandleError";
 import './LoadWalletFromDisk.css'
+import ModuleView from "../Modules/ModuleView"
 
 const styles = {
     bullet: {
@@ -40,13 +41,8 @@ class LoadWalletFromDisk extends Component<IRestoreDialogProps, {}> {
                 </Typography>
 
                 {modules && modules.map(module => {
-                    return <div key={module.id} className="module">
-                        <Typography variant="headline" component="h3">{module.name}</Typography>
-                        <form>
-                            <div ref={element => this.moduleInputs[module.id] = element}
-                                 dangerouslySetInnerHTML={{__html: module.htmlUi}}/>
-                        </form>
-                    </div>
+                    return <ModuleView key={module.id} innerRef={this.setInnerRef(module)}
+                                       module={module}/>
                 })}
 
                 <Button onClick={this.onUnlockClick} color="primary">
@@ -57,18 +53,16 @@ class LoadWalletFromDisk extends Component<IRestoreDialogProps, {}> {
         )
     }
 
+    private setInnerRef = (module: Module) => (element: any) => {
+        this.moduleInputs[module.id] = element
+    };
+
     private onUnlockClick = async () => {
         const moduleToInputsMap: { [moduleId: string]: any } = {};
 
         this.props.modules.forEach((module: Module) => {
-            const inputs = {};
-            const theModuleInputs = this.moduleInputs[module.id];
-            if (theModuleInputs) {
-                theModuleInputs.childNodes
-                    .forEach((node: any) => inputs[node.name] = node.value);
-            }
-
-            moduleToInputsMap[module.id] = inputs;
+            console.log(`onUnlockClick:getUserInputs = ${this.moduleInputs[module.id].getUserInputs()}`);
+            moduleToInputsMap[module.id] = this.moduleInputs[module.id].getUserInputs();
         });
 
         console.log(JSON.stringify({moduleToInputsMap}));

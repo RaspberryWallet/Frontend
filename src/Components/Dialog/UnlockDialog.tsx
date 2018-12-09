@@ -1,15 +1,16 @@
-import {Button, Typography, WithStyles, withStyles} from "@material-ui/core";
+import {Button, WithStyles, withStyles} from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog/Dialog";
 import DialogActions from "@material-ui/core/DialogActions/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
-import {Component, Fragment} from "react";
+import {Component} from "react";
 import * as React from "react";
 import {toast} from "react-toastify";
 import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
 import handleError from "../Errors/HandleError";
+import ModuleView from "../Modules/ModuleView";
 
 const styles = {
     bullet: {
@@ -29,7 +30,7 @@ interface IRestoreDialogProps extends WithStyles<typeof styles> {
     open: boolean;
     onClose: any;
     modules: Module[];
-    walletStatus : () => Promise<any>;
+    walletStatus: () => Promise<any>;
 }
 
 class UnlockDialog extends Component<IRestoreDialogProps, {}> {
@@ -44,20 +45,15 @@ class UnlockDialog extends Component<IRestoreDialogProps, {}> {
                 open={open}
                 aria-labelledby="form-dialog-title"
             >
-                <DialogTitle id="form-dialog-title">Init/Restore</DialogTitle>
+                <DialogTitle id="form-dialog-title">Unlock wallet</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Unlock your security modules
                     </DialogContentText>
 
                     {modules && modules.map(module => {
-                        return <Fragment key={module.id}>
-                            <Typography variant="headline" component="h3">{module.name}</Typography>
-                            <form>
-                                <div ref={element => this.moduleInputs[module.id] = element}
-                                     dangerouslySetInnerHTML={{__html: module.htmlUi}}/>
-                            </form>
-                        </Fragment>
+                        return <ModuleView key={module.id} innerRef={this.setInnerRef(module)}
+                                           module={module}/>
                     })}
                 </DialogContent>
                 <DialogActions>
@@ -71,6 +67,10 @@ class UnlockDialog extends Component<IRestoreDialogProps, {}> {
             </Dialog>
         )
     }
+
+    private setInnerRef = (module: Module) => (element: any) => {
+        this.moduleInputs[module.id] = element
+    };
 
     private onRestoreClick = () => {
         this.sendRestore();

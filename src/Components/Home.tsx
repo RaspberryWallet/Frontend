@@ -91,19 +91,20 @@ class Home extends Component<IAppProps, IAppState> {
         console.log("render");
         const {modules} = this.props;
 
-        const {walletStatus, currentAddress, estimatedBalance, availableBalance, cpuTemp} = this.state;
+        const {walletStatus, currentAddress, estimatedBalance, availableBalance, cpuTemp, syncProgress, autoLockRemaining} = this.state;
 
         return (
             <Fragment>
                 <Typography variant="headline" component="h4">
-                    {`AutoLock Remaining`}
+                    {`AutoLock Remaining = ${autoLockRemaining} sec`}
                 </Typography>
                 <LinearProgress variant="determinate"
                                 value={this.normaliseAutoLockProgress(this.state.autoLockRemaining)}/>
                 <Typography variant="headline" component="h4">
-                    {`Synchronization`}
+                    {`Synchronization = ${syncProgress} %`}
                 </Typography>
                 <LinearProgress variant="determinate" value={this.state.syncProgress}/>
+                <line/>
                 <Typography variant="headline" component="h2">
                     {`Status: ${walletStatus}`}
                 </Typography>

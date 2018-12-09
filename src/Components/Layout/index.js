@@ -122,7 +122,7 @@ class Layout extends Component {
                             <IconButton color="inherit">
                                 <img className={classes.logo} width="inherit" height="inherit" src={logo} alt="logo"/>
                             </IconButton>
-                            <Typography variant="title" color="inherit" noWrap={true}>
+                            <Typography variant="h6" color="inherit" noWrap={true}>
                                 Raspberry Wallet
                             </Typography>
                         </Toolbar>

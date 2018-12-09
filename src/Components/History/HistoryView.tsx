@@ -25,7 +25,7 @@ const styles = createStyles({
     },
     item: {
         margin: "10px 20px 30px 10px",
-        maxWidth: "60%"
+        maxWidth: "800px"
     }
 });
 
