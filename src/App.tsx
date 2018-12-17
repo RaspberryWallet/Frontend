@@ -1,11 +1,10 @@
 import {orange, pink} from "@material-ui/core/es/colors";
-import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
+import {createMuiTheme, MuiThemeProvider, WithStyles, withStyles} from '@material-ui/core/styles';
 import * as React from 'react';
 // @ts-ignore
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './App.css';
 import handleError from "./Components/Errors/HandleError";
 import NotFound from './Components/Errors/NotFound'
 import Home from './Components/Home'
@@ -15,7 +14,7 @@ import Modules from './Components/Modules/index'
 import {serverUrl} from './config'
 import logo from './logo.png'
 import Module from './Models/Module'
-
+import createStyles from "@material-ui/core/es/styles/createStyles";
 
 const theme = createMuiTheme({
     palette: {
@@ -26,13 +25,45 @@ const theme = createMuiTheme({
         useNextVariants: true,
     }
 });
+const styles  = createStyles({
+    App: {
+        textAlign: "center",
+    },
+    AppLogo: {
+        animation: 'AppLogoSpin infinite 15s linear',
+        height: '40vmin'
+    },
+    AppHeader: {
+        minHeight: '100vh',
+        backgroundColor: '#282c34',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 'calc(10px + 2vmin)',
+        color: 'white',
+    },
+    AppLink: {
+        color: "#61dafb"
+    },
+    "@keyframes AppLogoSpin": {
+        from: {
+            transform: 'rotate(0deg)'
+        },
+        to: {
+            transform: 'rotate(360deg)'
+        }
+    }
+});
 
+interface IAppProps extends WithStyles<typeof styles>{
 
+}
 interface IAppState {
     modules: Module[] | null;
 }
 
-class App extends React.Component<{}, IAppState> {
+class App extends React.Component<IAppProps, IAppState> {
     public state: IAppState = {
         modules: null,
     };
@@ -66,6 +97,7 @@ class App extends React.Component<{}, IAppState> {
     }
 
     public render() {
+        const {classes} = this.props;
         const {modules} = this.state;
 
         return (
@@ -75,26 +107,23 @@ class App extends React.Component<{}, IAppState> {
                 {modules &&
                 <BrowserRouter>
                     <MuiThemeProvider theme={theme}>
-
                         <Layout modules={modules}>
-
                             <Switch>
                                 <Route exact={true} path="/" render={this.renderInitPath}/>
                                 <Route exact={true} path="/home" render={this.renderHomePath}/>
                                 <Route path="/modules" render={this.renderModulesPath}/>
                                 <Route component={NotFound}/>
                             </Switch>
-
                         </Layout>
                     </MuiThemeProvider>
                 </BrowserRouter>
                 }
 
                 {!modules &&
-                <div className="App">
-                    <header className="App-header">
-                        <img src={logo} className="App-logo" alt="logo"/>
-                        <h1 className="App-title">Loading...</h1>
+                <div className={classes.App}>
+                    <header className={classes.AppHeader}>
+                        <img src={logo} className={classes.AppLogo} alt="logo"/>
+                        <h1>Loading...</h1>
                     </header>
                 </div>
                 }
@@ -127,4 +156,4 @@ class App extends React.Component<{}, IAppState> {
     }
 }
 
-export default App;
+export default withStyles(styles)(App);

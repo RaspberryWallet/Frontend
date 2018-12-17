@@ -1,4 +1,4 @@
-import {Button, Typography, WithStyles, withStyles} from "@material-ui/core";
+import {Button, createStyles, Typography, WithStyles, withStyles} from "@material-ui/core";
 import Checkbox from "@material-ui/core/Checkbox/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel/FormControlLabel";
 import TextField from "@material-ui/core/TextField/TextField";
@@ -8,21 +8,17 @@ import {toast} from "react-toastify";
 import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
 import handleError from "../Errors/HandleError";
-import './RestoreFromSeed.css'
 
-const styles = {
-    bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
+const styles = createStyles({
+    root: {
+        display: 'flex',
+        flexDirection: 'column',
     },
-    card: {
-        minWidth: 275,
-    },
-    pos: {
-        marginBottom: 12,
+    module: {
+        display: 'flex',
+        flexDirection: 'row',
     }
-};
+});
 
 interface IRestoreFromSeedProps extends WithStyles<typeof styles> {
     onSuccess: () => any;
@@ -47,9 +43,9 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
 
 
     public render() {
-        const {modules} = this.props;
+        const {modules, classes} = this.props;
         return (
-            <div className="root">
+            <div className={classes.root}>
                 <Typography variant="headline" component="h2">
                     Enter 12 mnemonic words to restore your wallet
                 </Typography>
@@ -63,7 +59,7 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
                     fullWidth={true}
                 />
                 {modules && modules.map(module => {
-                    return <div key={module.id} className="module">
+                    return <div key={module.id} className={classes.module}>
                         <FormControlLabel
                             control={
                                 <Checkbox

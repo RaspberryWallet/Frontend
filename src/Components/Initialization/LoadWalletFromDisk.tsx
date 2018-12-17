@@ -1,25 +1,17 @@
-import {Button, Typography, WithStyles, withStyles} from "@material-ui/core";
+import {Button, createStyles, Typography, WithStyles, withStyles} from "@material-ui/core";
 import {Component} from "react";
 import * as React from "react";
 import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
 import handleError from "../Errors/HandleError";
-import './LoadWalletFromDisk.css'
 import ModuleView from "../Modules/ModuleView"
 
-const styles = {
-    bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
-    },
-    card: {
-        minWidth: 275,
-    },
-    pos: {
-        marginBottom: 12,
-    },
-};
+const styles = createStyles({
+    root: {
+        display: 'flex',
+        flexDirection: 'column',
+    }
+});
 
 interface IRestoreDialogProps extends WithStyles<typeof styles> {
     onSuccess: () => any;
@@ -32,9 +24,9 @@ class LoadWalletFromDisk extends Component<IRestoreDialogProps, {}> {
 
 
     public render() {
-        const {modules} = this.props;
+        const {modules, classes} = this.props;
         return (
-            <div className="root">
+            <div className={classes.root}>
 
                 <Typography>
                     Unlock your security modules
