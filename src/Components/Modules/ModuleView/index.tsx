@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {Component} from 'react'
-import {serverUrl} from '../../../config'
+import {serverHttpUrl} from '../../../config'
 import Module from '../../../Models/Module'
 import ModuleState from '../../../Models/ModuleState'
 import {Button, Card, CardActions, CardContent, Typography, WithStyles, withStyles} from "@material-ui/core";
@@ -56,10 +56,10 @@ class ModuleView extends Component<IModuleProps, IModuleState> {
         return (
             <Card key={module.id} className={classes.card}>
                 <CardContent>
-                    <Typography variant="headline" component="h2">
+                    <Typography variant="h5">
                         {name}
                     </Typography>
-                    <Typography component="p">
+                    <Typography>
                         {description}
                     </Typography>
 
@@ -92,7 +92,7 @@ class ModuleView extends Component<IModuleProps, IModuleState> {
 
     private async submitModuleInput(id: string, inputs: any) {
         console.log(`id: ${id} inputs: ${JSON.stringify(inputs)}`);
-        const response = await fetch(`${serverUrl}/api/nextStep/${id}`, {
+        const response = await fetch(`${serverHttpUrl}/api/nextStep/${id}`, {
             body: JSON.stringify(inputs),
             method: 'POST'
         });
@@ -104,7 +104,7 @@ class ModuleView extends Component<IModuleProps, IModuleState> {
 
     private fetchModuleState = (moduleId: string) => async () => {
         console.log("fetchModuleState");
-        const response = await fetch(`${serverUrl}/api/moduleState/${moduleId}`);
+        const response = await fetch(`${serverHttpUrl}/api/moduleState/${moduleId}`);
         const moduleState = await response.json();
         this.setState({moduleState});
     }

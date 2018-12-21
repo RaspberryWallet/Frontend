@@ -4,13 +4,12 @@ import DialogActions from "@material-ui/core/DialogActions/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
-import {Component} from "react";
 import * as React from "react";
+import {Component} from "react";
 import {toast} from "react-toastify";
-import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
-import handleError from "../Errors/HandleError";
 import ModuleView from "../Modules/ModuleView";
+import Api from "../../Api";
 
 const styles = {
     bullet: {
@@ -30,7 +29,7 @@ interface IRestoreDialogProps extends WithStyles<typeof styles> {
     open: boolean;
     onClose: any;
     modules: Module[];
-    walletStatus: () => Promise<any>;
+    walletStatus: () => void;
 }
 
 class UnlockDialog extends Component<IRestoreDialogProps, {}> {
@@ -83,31 +82,14 @@ class UnlockDialog extends Component<IRestoreDialogProps, {}> {
         const moduleToInputsMap: { [moduleId: string]: any } = {};
 
         this.props.modules.forEach((module: Module) => {
-            const inputs = {};
             const theModuleInputs = this.moduleInputs[module.id];
-            if (theModuleInputs) {
-                theModuleInputs.childNodes
-                    .forEach((node: any) => inputs[node.name] = node.value);
-            }
-
-            moduleToInputsMap[module.id] = inputs;
+            moduleToInputsMap[module.id] = theModuleInputs.getUserInputs();
         });
 
-        console.log(JSON.stringify({moduleToInputsMap}));
-        const response = await fetch(`${serverUrl}/api/unlockWallet`, {
-            body: JSON.stringify(moduleToInputsMap),
-            headers: {
-                "Content-Type": "application/json; charset=utf-8",
-            },
-            method: 'POST',
-        });
-        if (response.ok) {
-            toast.success("Successfully unlocked wallet");
-            console.log(`sending restore`);
-            this.props.walletStatus();
-        } else {
-            handleError(response);
-        }
+        await Api.unlockWallet(moduleToInputsMap);
+        toast.success("Successfully unlocked wallet");
+        console.log(`sending restore`);
+        this.props.walletStatus();
     }
 
 }

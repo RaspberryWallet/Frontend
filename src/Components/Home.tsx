@@ -4,13 +4,13 @@ import {withStyles} from '@material-ui/core/styles';
 import * as React from 'react'
 import {Component, Fragment} from "react";
 import {toast} from "react-toastify";
-import {serverUrl} from '../config'
 import Module from "../Models/Module";
 import RestoreDialog from './Dialog/RestoreDialog'
 import SendCoinsDialog from './Dialog/SendCoinsDialog'
 import UnlockDialog from "./Dialog/UnlockDialog";
-import handleError from "./Errors/HandleError";
 import History from "./History/History";
+import Api from "../Api";
+import {serverWsUrl} from "../config";
 
 const styles = {
     bullet: {
@@ -42,6 +42,7 @@ interface IAppState {
     syncProgress: number;
     autoLockRemaining: number;
     transactions: Transaction[];
+    isLoading: boolean;
 }
 
 class Home extends Component<IAppProps, IAppState> {
@@ -55,17 +56,25 @@ class Home extends Component<IAppProps, IAppState> {
         openSendDialog: false,
         openUnlockDialog: false,
         walletStatus: "FIRST_TIME",
-        syncProgress: 100,
+        syncProgress: 0,
         autoLockRemaining: 300,
-        transactions : new Array<Transaction>(),
+        transactions: new Array<Transaction>(),
+        isLoading: false
     };
+    private socketBlockChainSync: WebSocket;
+    private autoLockSocket: WebSocket;
 
+    public constructor(props: IAppProps) {
+        super(props);
+
+        this.socketBlockChainSync = new WebSocket(`${serverWsUrl}/blockChainSyncProgress`);
+        this.autoLockSocket = new WebSocket(`${serverWsUrl}/autolock`);
+    }
 
     public componentDidMount() {
-        this.fetchPing();
+        Api.fetchPing();
         this.walletStatus();
-        const socketBlockChainSync = new WebSocket(`ws://localhost/blockChainSyncProgress`);
-        socketBlockChainSync.addEventListener('message', (event) => {
+        this.socketBlockChainSync.addEventListener('message', (event: MessageEvent) => {
             const progress = parseInt(event.data, 10);
             console.log(`Sync progress ${progress}`);
             this.setState({syncProgress: progress});
@@ -73,9 +82,7 @@ class Home extends Component<IAppProps, IAppState> {
                 this.walletStatus()
             }
         });
-
-        const autoLockSocket = new WebSocket(`ws://localhost/autolock`);
-        autoLockSocket.addEventListener('message', (event) => {
+        this.autoLockSocket.addEventListener('message', (event: MessageEvent) => {
             const value = event.data;
             if (value === "0") {
                 toast.info(`Wallet locked`);
@@ -86,42 +93,49 @@ class Home extends Component<IAppProps, IAppState> {
         });
     }
 
+    public componentWillUnmount(): void {
+        this.autoLockSocket.close();
+        this.socketBlockChainSync.close();
+    }
+
 
     public render() {
-        console.log("render");
         const {modules} = this.props;
 
         const {walletStatus, currentAddress, estimatedBalance, availableBalance, cpuTemp, syncProgress, autoLockRemaining} = this.state;
-
+        const {isLoading} = this.state;
         return (
             <Fragment>
-                <Typography variant="headline" component="h4">
+                {isLoading &&
+                <LinearProgress color="secondary" variant="query"/>
+                }
+                <Typography variant="h5">
                     {`AutoLock Remaining = ${autoLockRemaining} sec`}
                 </Typography>
                 <LinearProgress variant="determinate"
                                 value={this.normaliseAutoLockProgress(this.state.autoLockRemaining)}/>
-                <Typography variant="headline" component="h4">
+                <Typography variant="h5">
                     {`Synchronization = ${syncProgress} %`}
                 </Typography>
                 <LinearProgress variant="determinate" value={this.state.syncProgress}/>
-                <line/>
-                <Typography variant="headline" component="h2">
+
+                <Typography variant="h5">
                     {`Status: ${walletStatus}`}
                 </Typography>
 
-                <Typography variant="headline" component="h2">
+                <Typography variant="h5">
                     {`CpuTemp: ${cpuTemp}`}
                 </Typography>
                 <Button size="small" onClick={this.fetchCpuTemp}>Refresh Temp</Button>
 
-                <Typography variant="headline" component="h2">
+                <Typography variant="h5">
                     {`Receive Address: ${currentAddress}`}
                 </Typography>
 
 
                 <Button size="small" onClick={this.fetchFreshAddress}>Refresh Address</Button>
 
-                <Typography variant="headline" component="h2">
+                <Typography variant="h5">
                     {`Balance: ${availableBalance}(${estimatedBalance})`}
                 </Typography>
 
@@ -153,7 +167,7 @@ class Home extends Component<IAppProps, IAppState> {
                 <History transactions={this.state.transactions}/>
                 }
                 {!this.state.transactions &&
-                <Typography variant="headline" component="h2">{`No operations found`}</Typography>
+                <Typography variant="h3">{`No operations found`}</Typography>
                 }
 
 
@@ -161,118 +175,68 @@ class Home extends Component<IAppProps, IAppState> {
         )
     }
 
+
     private normaliseAutoLockProgress = (value: number) => value * 100 / 300;
 
-    private fetchPing = async () => {
-        console.log(`fetching pings`);
-        const response = await fetch(serverUrl + '/api/ping');
-        const ping = await response.json();
-        console.log(`fetched ping ${JSON.stringify(ping)}`);
+
+    private fetchCurrentAddress = () => {
+        this.executeLoading(async () => {
+            const currentAddress = await Api.fetchCurrentAddress();
+            this.setState({currentAddress});
+        });
     };
 
-    private fetchCurrentAddress = async () => {
-        console.log(`fetching current address`);
-        const response = await fetch(serverUrl + '/api/currentAddress');
-        if (response.ok) {
-            let currentAddress = await response.json();
-            currentAddress = currentAddress.currentAddress;
-            console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
-            this.setState({currentAddress})
-        } else {
-            handleError(response)
-        }
+    private fetchFreshAddress = () => {
+        this.executeLoading(async () => {
+            const currentAddress = await Api.fetchFreshAddress();
+            this.setState({currentAddress});
+        });
     };
 
-    private fetchFreshAddress = async () => {
-        console.log(`fetching fresh address`);
-        const response = await fetch(serverUrl + '/api/freshAddress');
-        if (response.ok) {
-            let currentAddress = await response.json();
-            currentAddress = currentAddress.freshAddress;
-            console.log(`currentAddress ${JSON.stringify(currentAddress)}`);
-            this.setState({currentAddress})
-        } else {
-            handleError(response)
-        }
-    };
-
-
-    private fetchEstimatedBalance = async () => {
-        console.log(`fetching estimated balance`);
-        const response = await fetch(serverUrl + '/api/estimatedBalance');
-        if (response.ok) {
-            let estimatedBalance = await response.json();
-            estimatedBalance = estimatedBalance.estimatedBalance;
-            console.log(`estimatedBalance ${JSON.stringify(estimatedBalance)}`);
+    private fetchEstimatedBalance = () => {
+        this.executeLoading(async () => {
+            const estimatedBalance = await Api.fetchEstimatedBalance();
             this.setState({estimatedBalance})
-        } else {
-            handleError(response)
-        }
+        });
     };
 
-    private fetchAvailableBalance = async () => {
-        console.log(`fetching available balance`);
-        const response = await fetch(serverUrl + '/api/availableBalance');
-        if (response.ok) {
-            let availableBalance = await response.json();
-            availableBalance = availableBalance.availableBalance;
-            console.log(`available balance ${JSON.stringify(availableBalance)}`);
-            this.setState({availableBalance})
-        } else {
-            handleError(response)
-        }
+    private fetchAvailableBalance = () => {
+        this.executeLoading(async () => {
+            const availableBalance = await Api.fetchAvailableBalance();
+            this.setState({availableBalance});
+        });
     };
 
-    private fetchTransactions = async () => {
-        console.log(`fetching transactions`);
-        const response = await fetch(serverUrl + '/api/allTransactions');
-        if (response.ok) {
-            let transactions = await response.json();
-            transactions = transactions.allTransactions;
-            console.log(`allTransactions ${JSON.stringify(transactions)}`);
+    private fetchTransactions = () => {
+        this.executeLoading(async () => {
+            const transactions = await Api.fetchTransactions();
             this.setState({transactions})
-        } else {
-            handleError(response)
-        }
+        });
     };
 
-    private fetchCpuTemp = async () => {
-        console.log(`fetching cpu temp`);
-        const response = await fetch(serverUrl + '/api/cpuTemp');
-        let cpuTemp = await response.json();
-        cpuTemp = cpuTemp.cpuTemp;
-        console.log(`available balance ${JSON.stringify(cpuTemp)}`);
-        this.setState({cpuTemp})
+    private fetchCpuTemp = () => {
+        this.executeLoading(async () => {
+            const cpuTemp = await Api.fetchCpuTemp();
+            this.setState({cpuTemp})
+        });
     };
 
-
-    private lockWallet = async () => {
-        console.log(`fetching lockWallet`);
-        const response = await fetch(serverUrl + '/api/lockWallet');
-        if (response.ok) {
-            const responseText = await response.text();
-            console.log(`lockWallet ${responseText}`);
-            toast.success("Successfully locked wallet")
-            this.walletStatus()
-        } else {
-            handleError(response)
-        }
+    private lockWallet = () => {
+        this.executeLoading(async () => {
+            await Api.lockWallet();
+            toast.success("Successfully locked wallet");
+            this.walletStatus();
+        });
     };
 
-    private walletStatus = async () => {
-        console.log(`fetching walletStatus`);
-        const response = await fetch(serverUrl + '/api/walletStatus');
-        if (response.ok) {
-            let walletStatus = await response.json();
-            walletStatus = walletStatus.walletStatus;
-            console.log(`walletStatus ${JSON.stringify(walletStatus)}`);
+    private walletStatus = () => {
+        this.executeLoading(async () => {
+            const walletStatus = await Api.walletStatus();
             this.setState({walletStatus});
             this.fetchCurrentAddress();
             this.refreshBalances();
             this.fetchTransactions();
-        } else {
-            handleError(response)
-        }
+        });
     };
 
     private refreshBalances = () => {
@@ -302,8 +266,23 @@ class Home extends Component<IAppProps, IAppState> {
 
     private handleCloseSendDialog = () => {
         this.setState({openSendDialog: false});
-    }
+    };
+    private startLoading = () => {
+        this.setState({isLoading: true});
+    };
+    private stopLoading = () => {
+        this.setState({isLoading: false});
+    };
 
+    private async executeLoading(param: () => void) {
+        this.startLoading();
+        try {
+            await param();
+        } catch (e) {
+            console.error(e)
+        }
+        this.stopLoading();
+    }
 }
 
 export default withStyles(styles)(Home)

@@ -6,7 +6,7 @@ import {Component, Fragment} from "react";
 import {ChangeEvent} from "react";
 import {Redirect} from "react-router";
 import {toast} from "react-toastify";
-import {serverUrl} from "../../config";
+import {serverHttpUrl} from "../../config";
 import Module from "../../Models/Module";
 import handleError from "../Errors/HandleError";
 import LoadWalletFromDisk from "./LoadWalletFromDisk";
@@ -88,7 +88,7 @@ class Initialization extends Component<IInitProps, IInitState> {
     }
 
     private setDatabasePassword = async () => {
-        const response = await fetch(`${serverUrl}/api/setDatabasePassword`, {
+        const response = await fetch(`${serverHttpUrl}/api/setDatabasePassword`, {
             body: JSON.stringify({password: this.state.password}),
             headers: {
                 "Content-Type": "application/json; charset=utf-8",
@@ -106,7 +106,7 @@ class Initialization extends Component<IInitProps, IInitState> {
 
     private fetchWalletStatus = async () => {
         console.log(`fetching walletStatus`);
-        const response = await fetch(serverUrl + '/api/walletStatus');
+        const response = await fetch(serverHttpUrl + '/api/walletStatus');
         if (response.ok) {
             let walletStatus = await response.json();
             walletStatus = walletStatus.walletStatus;

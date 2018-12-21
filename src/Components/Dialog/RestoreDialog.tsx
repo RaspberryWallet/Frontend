@@ -9,7 +9,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel/FormControlLabe
 import TextField from "@material-ui/core/TextField/TextField";
 import {ChangeEvent, Component, Fragment} from "react";
 import * as React from "react";
-import {serverUrl} from "../../config";
+import {serverHttpUrl} from "../../config";
 import Module from "../../Models/Module";
 
 const styles = {
@@ -157,7 +157,7 @@ class RestoreDialog extends Component<IRestoreDialogProps, IRestoreDialogState> 
         });
 
         console.log(JSON.stringify({mnemonicWords: mnemonicWords.split(" "), modules, required}));
-        const response = await fetch(`${serverUrl}/api/restoreFromBackupPhrase`, {
+        const response = await fetch(`${serverHttpUrl}/api/restoreFromBackupPhrase`, {
             body: JSON.stringify({mnemonicWords: mnemonicWords.split(" "), modules, required}),
             headers: {
                 "Content-Type": "application/json; charset=utf-8",

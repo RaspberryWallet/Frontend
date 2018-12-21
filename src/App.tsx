@@ -5,16 +5,16 @@ import * as React from 'react';
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import handleError from "./Components/Errors/HandleError";
 import NotFound from './Components/Errors/NotFound'
 import Home from './Components/Home'
 import Initialization from "./Components/Initialization/Initialization";
 import Layout from './Components/Layout/index'
 import Modules from './Components/Modules/index'
-import {serverUrl} from './config'
 import logo from './logo.png'
 import Module from './Models/Module'
 import createStyles from "@material-ui/core/es/styles/createStyles";
+import Api from "./Api";
+import {serverWsUrl} from "./config";
 
 const theme = createMuiTheme({
     palette: {
@@ -25,7 +25,7 @@ const theme = createMuiTheme({
         useNextVariants: true,
     }
 });
-const styles  = createStyles({
+const styles = createStyles({
     App: {
         textAlign: "center",
     },
@@ -56,9 +56,10 @@ const styles  = createStyles({
     }
 });
 
-interface IAppProps extends WithStyles<typeof styles>{
+interface IAppProps extends WithStyles<typeof styles> {
 
 }
+
 interface IAppState {
     modules: Module[] | null;
 }
@@ -68,9 +69,16 @@ class App extends React.Component<IAppProps, IAppState> {
         modules: null,
     };
 
-    public successSocket = new WebSocket(`ws://localhost/success`);
-    public errorSocket = new WebSocket(`ws://localhost/error`);
-    public infoSocket = new WebSocket(`ws://localhost/info`);
+    public successSocket: WebSocket;
+    public errorSocket: WebSocket;
+    public infoSocket: WebSocket;
+
+    constructor(props: IAppProps) {
+        super(props);
+        this.successSocket = new WebSocket(serverWsUrl + "/success");
+        this.errorSocket = new WebSocket(serverWsUrl + "/error");
+        this.infoSocket = new WebSocket(serverWsUrl + "/info");
+    }
 
     public componentDidMount() {
         this.fetchModules();
@@ -88,12 +96,9 @@ class App extends React.Component<IAppProps, IAppState> {
 
 
     public componentWillUnmount(): void {
-        // @ts-ignore
-        super.componentWillUnmount();
         this.successSocket.close();
         this.infoSocket.close();
         this.errorSocket.close();
-
     }
 
     public render() {
@@ -143,16 +148,9 @@ class App extends React.Component<IAppProps, IAppState> {
         return <Modules {...props} modules={this.state.modules}/>;
     };
 
-
     private async fetchModules() {
-        console.log(`fetching modules`);
-        const response = await fetch(serverUrl + '/api/modules');
-        if (response.ok) {
-            const modules = await response.json();
-            this.setState({modules});
-        } else {
-            handleError(response)
-        }
+        const modules: Module[] = await Api.fetchModules();
+        this.setState({modules});
     }
 }
 

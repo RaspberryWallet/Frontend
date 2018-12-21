@@ -1,7 +1,7 @@
 import {Button, createStyles, Typography, WithStyles, withStyles} from "@material-ui/core";
 import {Component} from "react";
 import * as React from "react";
-import {serverUrl} from "../../config";
+import {serverHttpUrl} from "../../config";
 import Module from "../../Models/Module";
 import handleError from "../Errors/HandleError";
 import ModuleView from "../Modules/ModuleView"
@@ -32,10 +32,10 @@ class LoadWalletFromDisk extends Component<IRestoreDialogProps, {}> {
                     Unlock your security modules
                 </Typography>
 
-                {modules && modules.map(module => {
-                    return <ModuleView key={module.id} innerRef={this.setInnerRef(module)}
-                                       module={module}/>
-                })}
+                {modules && modules.map(module =>
+                    <ModuleView key={module.id} innerRef={this.setInnerRef(module)}
+                                module={module}/>
+                )}
 
                 <Button onClick={this.onUnlockClick} color="primary">
                     Unlock
@@ -58,7 +58,7 @@ class LoadWalletFromDisk extends Component<IRestoreDialogProps, {}> {
         });
 
         console.log(JSON.stringify({moduleToInputsMap}));
-        const response = await fetch(`${serverUrl}/api/loadWalletFromDisk`, {
+        const response = await fetch(`${serverHttpUrl}/api/loadWalletFromDisk`, {
             body: JSON.stringify(moduleToInputsMap),
             headers: {
                 "Content-Type": "application/json; charset=utf-8",

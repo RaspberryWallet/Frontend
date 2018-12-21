@@ -7,7 +7,7 @@ import TextField from "@material-ui/core/TextField/TextField";
 import {ChangeEvent, Component} from "react";
 import * as React from "react";
 import {toast} from "react-toastify";
-import {serverUrl} from "../../config";
+import {serverHttpUrl} from "../../config";
 import handleError from "../Errors/HandleError";
 
 const styles = {
@@ -99,7 +99,7 @@ class SendCoinsDialog extends Component<ISendCoinsDialogProps, ISendCoinsDialogS
         const {amount, recipient} = this.state;
         console.log(`sending ${amount} BTBC to ${recipient}`);
 
-        const response = await fetch(`${serverUrl}/api/sendCoins`, {
+        const response = await fetch(`${serverHttpUrl}/api/sendCoins`, {
             body: JSON.stringify({amount, recipient}),
             headers: {
                 "Content-Type": "application/json; charset=utf-8",

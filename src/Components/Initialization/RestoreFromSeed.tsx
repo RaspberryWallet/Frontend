@@ -5,9 +5,8 @@ import TextField from "@material-ui/core/TextField/TextField";
 import {ChangeEvent, Component} from "react";
 import * as React from "react";
 import {toast} from "react-toastify";
-import {serverUrl} from "../../config";
 import Module from "../../Models/Module";
-import handleError from "../Errors/HandleError";
+import Api from "../../Api";
 
 const styles = createStyles({
     root: {
@@ -46,7 +45,7 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
         const {modules, classes} = this.props;
         return (
             <div className={classes.root}>
-                <Typography variant="headline" component="h2">
+                <Typography variant="h5">
                     Enter 12 mnemonic words to restore your wallet
                 </Typography>
                 <TextField
@@ -133,19 +132,10 @@ class RestoreFromSeed extends Component<IRestoreFromSeedProps, IRestoreFromSeedS
         });
 
         console.log(JSON.stringify({mnemonicWords: mnemonicWords.split(" "), modules, required}));
-        const response = await fetch(`${serverUrl}/api/restoreFromBackupPhrase`, {
-            body: JSON.stringify({mnemonicWords: mnemonicWords.split(" "), modules, required}),
-            headers: {
-                "Content-Type": "application/json; charset=utf-8",
-            },
-            method: 'POST',
-        });
-        if (response.ok) {
-            toast.success("Restored successfully");
-            this.props.onSuccess();
-        } else {
-            handleError(response);
-        }
+
+        await Api.postRestoreFromBackupPhrase(mnemonicWords, modules, required);
+        toast.success("Restored successfully");
+        this.props.onSuccess();
     }
 }
 

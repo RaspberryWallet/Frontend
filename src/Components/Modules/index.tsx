@@ -3,9 +3,10 @@ import * as React from 'react'
 import {Component, Fragment} from 'react'
 // @ts-ignore
 import {Redirect, Route, Switch} from "react-router-dom";
-import {serverUrl} from "../../config";
+import {serverHttpUrl} from "../../config";
 import Module from '../../Models/Module'
 import ModuleView from './ModuleView/index'
+import Api from "../../Api";
 
 const styles = {
     bullet: {
@@ -74,18 +75,17 @@ class Modules extends Component<IModulesProps, IModulesState> {
 
         if (!modules) {
             return <h3>No modules found</h3>;
-        }
-        else {
+        } else {
             return modules.map((module: Module) => {
                     return <Card key={module.id} className={classes.card}>
                         <CardContent>
-                            <Typography variant="headline" component="h2">
+                            <Typography variant="h5">
                                 {module.name}
                             </Typography>
                             <Typography className={classes.pos} color="textSecondary">
                                 {module.id}
                             </Typography>
-                            <Typography component="p">
+                            <Typography>
                                 {module.description}
                             </Typography>
                             <Typography color="textSecondary">
@@ -101,7 +101,7 @@ class Modules extends Component<IModulesProps, IModulesState> {
                             </form>
 
                             {this.state.inputResponse[module.id] &&
-                            <Typography component="p">
+                            <Typography>
                                 {`Response: ${this.state.inputResponse[module.id].response}`}
                             </Typography>}
 
@@ -149,14 +149,13 @@ class Modules extends Component<IModulesProps, IModulesState> {
     };
 
     private fetchModuleState = (id: string) => async () => {
-        const response = await fetch(`${serverUrl}/api/moduleState/${id}`);
-        const moduleState = await response.json();
+        const moduleState = await Api.fetchModuleState(id);
         this.setState(state => state.moduleStates[id] = moduleState);
     };
 
     private async submitModuleInput(id: string, inputs: any) {
         console.log(`id: ${id} inputs: ${JSON.stringify(inputs)}`);
-        const response = await fetch(`${serverUrl}/api/nextStep/${id}`, {
+        const response = await fetch(`${serverHttpUrl}/api/nextStep/${id}`, {
             body: JSON.stringify(inputs),
             method: 'POST'
         });
