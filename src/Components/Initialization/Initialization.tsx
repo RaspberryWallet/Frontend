@@ -1,6 +1,5 @@
-import {Button, WithStyles} from "@material-ui/core";
+import {Button} from "@material-ui/core";
 import TextField from "@material-ui/core/es/TextField/TextField";
-import {withStyles} from '@material-ui/core/styles';
 import * as React from 'react'
 import {Component, Fragment} from "react";
 import {ChangeEvent} from "react";
@@ -13,24 +12,8 @@ import LoadWalletFromDisk from "./LoadWalletFromDisk";
 import RestoreFromSeed from "./RestoreFromSeed";
 
 
-const styles = {
-    bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
-    },
-    card: {
-        minWidth: 275,
-    },
-    textField: {
-        width: 200,
-    },
-    pos: {
-        marginBottom: 12,
-    },
-};
 
-interface IInitProps extends WithStyles<typeof styles> {
+interface IInitProps {
     modules: Module[];
 }
 
@@ -64,7 +47,6 @@ class Initialization extends Component<IInitProps, IInitState> {
                         id="standard-password-input"
                         label="Database Password"
                         onChange={this.onPasswordChange}
-                        className={this.props.classes.textField}
                         type="password"
                         autoComplete="current-password"
                         margin="normal"
@@ -128,4 +110,4 @@ class Initialization extends Component<IInitProps, IInitState> {
     }
 }
 
-export default withStyles(styles)(Initialization)
+export default Initialization

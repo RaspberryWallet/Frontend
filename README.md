@@ -16,12 +16,14 @@ This module is resposible for forntend of Raspberry Wallet. It doesn't contain a
 git clone https://github.com/RaspberryWallet/Frontend.git
 cd Frontend
 
-# will start app in development mode
+# insatll node modules
+yarn insatll
+
+# start app in development mode
 yarn start
 
-# or you can build production ready app
-yarn build 
-
+# if you are using Wandors use
+yarn start-wandors
 ```
 
 ## Table of contents
